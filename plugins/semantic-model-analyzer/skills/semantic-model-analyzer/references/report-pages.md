@@ -12,7 +12,7 @@ Read this when the user asks for the report, or asks where something is in it.
 | `semantic-model.html` | the input has TMDL | Every TMDL reading, one section at a time. |
 | `power-query.html` | the input has M, or the model's partitions carry M | Queries, steps, connectors, folding, native SQL. |
 | `ai-readiness.html` | the input has TMDL | Sixteen checks in three groups. |
-| `references.html` | always | The people and documentation behind the analyser. |
+| `references.html` | always | The people and documentation behind the analyzer. |
 
 The pages are self-contained: theme, script and logo inlined, zero network requests. They open
 from `file://`, survive being emailed and work offline, in light and dark. A 1,000-measure model

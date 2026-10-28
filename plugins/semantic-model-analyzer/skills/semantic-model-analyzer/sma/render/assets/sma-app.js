@@ -1,4 +1,4 @@
-/* Semantic Model Analyser: the app layer over the DC doc theme.
+/* Semantic Model Analyzer: the app layer over the DC doc theme.
  *
  * The page is still a document: with no script every section is on it, in order, and
  * every link is an anchor. This adds what makes it quick to use: a finder over every

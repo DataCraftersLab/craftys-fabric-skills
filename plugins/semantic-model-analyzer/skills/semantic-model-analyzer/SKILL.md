@@ -1,5 +1,5 @@
 ---
-name: semantic-model-analyser
+name: semantic-model-analyzer
 description: >
   Reads a Power BI semantic model or its Power Query as text and answers questions about it from the
   definition, citing file and line: what is in it, what needs attention, what a measure reads and what
@@ -13,7 +13,7 @@ description: >
   lineage or star-schema design reviews, and it never edits the model.
 ---
 
-# Semantic Model Analyser
+# Semantic Model Analyzer
 
 ## Outcome
 The user gets an answer about a Power BI semantic model that is grounded in its definition, with

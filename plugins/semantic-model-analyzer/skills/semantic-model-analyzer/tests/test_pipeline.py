@@ -254,6 +254,26 @@ class TestDataset(unittest.TestCase):
         self.assertEqual(self.report["version"], dataset.VERSION)
         self.assertEqual(self.report["parts"], ["tmdl", "m"])
 
+    def test_a_dataset_from_before_the_rename_still_loads(self):
+        """report.json files written as semantic-model-analyser/report are the same shape, so
+        diff and render keep reading them after the rename to Analyzer."""
+        old = dict(self.report, schema="semantic-model-analyser/report")
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "old.json"
+            path.write_text(json.dumps(old), encoding="utf-8")
+            self.assertEqual(dataset.load(path)["parts"], ["tmdl", "m"])
+            path.write_text(json.dumps(dict(old, schema="something-else/report")), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                dataset.load(path)
+
+    def test_analyze_is_accepted_as_a_spelling_of_analyse(self):
+        from sma import cli
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(cli.main(["analyze", str(FIX)]), 0)
+        self.assertIn("rules fired", out.getvalue())
+
     def test_stable_across_runs(self):
         """Two builds of one input differ only in the timestamp. If anything else moves,
         a golden-file diff stops being able to tell a real change from set ordering.

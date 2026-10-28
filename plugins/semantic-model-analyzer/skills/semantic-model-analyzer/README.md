@@ -1,4 +1,4 @@
-# Semantic Model Analyser
+# Semantic Model Analyzer
 
 Read a Power BI model as text and say what is in it.
 
@@ -37,7 +37,7 @@ service, and stops if the input holds something that looks like a credential.
 the skill folder on the module path (`-B` keeps bytecode out of the skill folder):
 
 ```bash
-export PYTHONPATH=/path/to/semantic-model-analyser
+export PYTHONPATH=/path/to/semantic-model-analyzer
 python -B -m sma inspect ./MyModel.SemanticModel                     # what would be read
 python -B -m sma analyse ./MyModel.SemanticModel                     # what the rules found
 python -B -m sma report  ./MyModel.SemanticModel -o ./out --html     # everything
@@ -270,7 +270,7 @@ the Power Query file, with its path, or the `--label` when one was given.
 `index.html` is the landing page: stat cards, what stands out, a model health checklist, a
 data lineage graph from source to measure and a measure lineage graph. `semantic-model.html`
 and `power-query.html` show one section at a time; `ai-readiness.html` holds sixteen checks;
-`references.html` lists the people and documentation behind the analyser. `Ctrl K` finds any
+`references.html` lists the people and documentation behind the analyzer. `Ctrl K` finds any
 object, finding or section across the pages and opens it in a side inspector.
 
 Measured at 1,000 measures over 20 tables and 30 relationships: the full report builds
@@ -284,13 +284,13 @@ Do not hand-edit the output. Change the source and re-render.
 In Claude Code:
 
 ```
-/plugin install semantic-model-analyser --marketplace DataCraftersLab/craftys-fabric-skills
+/plugin install semantic-model-analyzer --marketplace DataCraftersLab/craftys-fabric-skills
 ```
 
 For any other agent that reads the Agent Skills format, copy the whole folder into its skills directory:
 
 ```bash
-cp -r semantic-model-analyser <skills directory>/semantic-model-analyser
+cp -r semantic-model-analyzer <skills directory>/semantic-model-analyzer
 ```
 
 `SKILL.md` at the root is the entry point — its frontmatter tells Claude when to reach
@@ -300,7 +300,7 @@ loads on demand is in `references/`.
 ## Tests
 
 ```bash
-python -m unittest discover -s tests -t .     # 139 tests, no dependencies
+python -m unittest discover -s tests -t .     # 141 tests, no dependencies
 python tests/parsers/test_tmdl_parser.py      # 132 checks on the vendored TMDL parser
 python tests/parsers/test_m_parser.py         # 148 checks on the vendored M parser
 python tests/validate_html.py                 # 110 browser checks per model, both themes

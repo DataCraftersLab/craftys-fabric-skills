@@ -1,5 +1,5 @@
 """
-Semantic Model Analyser -- read a Power BI model as text, and say what is in it.
+Semantic Model Analyzer -- read a Power BI model as text, and say what is in it.
 
 Four stages, and each one can be stopped at:
 

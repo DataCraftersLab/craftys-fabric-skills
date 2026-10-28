@@ -18,6 +18,7 @@ $env:PYTHONPATH = "SKILL_DIR"; python -B -m sma COMMAND [PATHS] [options]   # Po
 
 `-B` stops Python writing bytecode into the skill folder. Below, `sma` stands for that prefix.
 `sma --version` prints the engine version.
+`analyze` is accepted as a spelling of `analyse`.
 
 A scratch folder for a dataset that answers several questions, fresh per run so parallel
 sessions never share a file, and deleted when the task ends:

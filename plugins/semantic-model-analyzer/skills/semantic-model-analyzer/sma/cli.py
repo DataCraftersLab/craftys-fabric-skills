@@ -234,7 +234,7 @@ def cmd_diff(args):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(
-        prog="sma", description="Semantic Model Analyser " + chr(0x2014)
+        prog="sma", description="Semantic Model Analyzer " + chr(0x2014)
         + " read a Power BI model as text and say what is in it.")
     ap.add_argument("--version", action="version", version="%(prog)s " + __version__)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -274,7 +274,7 @@ def main(argv=None):
     p.add_argument("-o", "--out", default="report.json")
     p.set_defaults(fn=cmd_dataset)
 
-    p = sub.add_parser("analyse", help="run the rules and list what they found")
+    p = sub.add_parser("analyse", aliases=["analyze"], help="run the rules and list what they found")
     shared(p, paths="optional")
     p.add_argument("--report", help="read an existing report.json instead of parsing")
     p.add_argument("--all", action="store_true", help="notes as well as warnings")

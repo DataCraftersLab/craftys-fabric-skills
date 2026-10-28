@@ -47,7 +47,9 @@ from .inputs import (MODE_BOTH, MODE_M, MODE_TMDL, LineMap, m_document, subject_
 from .vendor.m_parser import Model as MModel
 from .vendor.tmdl_parser import Model as TmdlModel
 
-SCHEMA = "semantic-model-analyser/report"
+SCHEMA = "semantic-model-analyzer/report"
+#: Datasets written before the rename to Analyzer carry this id; they are the same shape.
+LEGACY_SCHEMAS = ("semantic-model-analyser/report",)
 #: Bump on any change a consumer could notice. The renderer checks it and refuses a
 #: dataset it does not understand rather than half-rendering one.
 VERSION = 2
@@ -581,7 +583,7 @@ def dumps(report):
 
 def load(path):
     report = json.loads(Path(path).read_text(encoding="utf-8"))
-    if report.get("schema") != SCHEMA:
+    if report.get("schema") != SCHEMA and report.get("schema") not in LEGACY_SCHEMAS:
         raise ValueError("not a %s dataset: %r" % (SCHEMA, report.get("schema")))
     if report.get("version") != VERSION:
         raise ValueError(
