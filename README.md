@@ -1,39 +1,68 @@
 # Data Crafters Skills
 
-<!-- BG&C: positioning, tagline and intro to be written. Placeholder text below. -->
+<!-- BG&C: positioning, tagline and intro to be finalised. Working copy below. -->
 
-Free Claude skills from Data Crafters for data engineering and Power BI work.
+Claude skills for Microsoft Fabric and Power BI, built from how we deliver for clients. Free under Apache-2.0.
 
-## Install
+## Semantic Model Analyser
 
-**Claude Code.** One step:
+**Ask Claude what is in your Power BI model. No Power BI Desktop, no XMLA connection, no Fabric access.**
+
+Point Claude at a PBIP project, a folder of TMDL files, or a Power Query paste, and ask:
+
+- "Which measures have no description or no format string?"
+- "What breaks if I change `Total Sales`?"
+- "What changed between last month's model and this one?"
+- "Are there inactive, bi-directional or many-to-many relationships?"
+- "Where does this query's SQL actually run, and where does folding break?"
+- "Give me an HTML report I can hand to the team."
+
+<!-- BG&C: a screenshot or short clip of the HTML report goes here. -->
+
+### What you get
+
+- **Answers from the definition.** Measures, columns, tables, relationships, roles, calculation groups, partitions and storage mode, DAX dependency chains, query steps, custom functions, connectors and native SQL.
+- **Findings with a named subject.** Thirty rules (twenty for the semantic model, ten for Power Query), each pointing at the file and line, such as unreferenced measures, deep dependency chains, implicit measures and relationship loops.
+- **A report you can share.** Self-contained HTML pages that open without a server and make no network requests.
+- **Model diffs.** What changed between two versions, in model terms rather than a text diff.
+
+### Why it is safe to run on client models
+
+It reads the model's text only. It never connects to the model and never sees a row of data. It runs locally on Python 3.9 or later with no packages to install.
+
+### Install
+
+Claude Code:
 
 ```
-/plugin install semantic-model-analyser --marketplace DataCraftersLab/dc-skills-public
+/plugin install semantic-model-analyser --marketplace DataCraftersLab/skills
 ```
 
-Or add the marketplace once and install from it:
+Codex, Copilot, Cursor, Gemini CLI and other agents:
 
 ```
-/plugin marketplace add DataCraftersLab/dc-skills-public
-/plugin install semantic-model-analyser@datacrafters-public
+npx skills add DataCraftersLab/skills --skill semantic-model-analyser
 ```
 
-**Other agents.**
+Claude.ai and Claude Desktop: download the zip from [Releases](https://github.com/DataCraftersLab/skills/releases?q=semantic-model-analyser&expanded=true) and upload it under Settings, Capabilities, Skills.
 
-```
-npx skills add DataCraftersLab/dc-skills-public --skill semantic-model-analyser
-```
+Full documentation: [the skill's README](plugins/semantic-model-analyser/skills/semantic-model-analyser/README.md).
 
-**Download a zip.** Every skill version is published as a zip on the [Releases](https://github.com/DataCraftersLab/dc-skills-public/releases) page. Upload it to Claude.ai or Claude Desktop under Settings, Capabilities, Skills, or unzip it into your agent's skills folder. A zip does not update itself; the install commands above do.
+## All skills
 
-Each skill is its own plugin, so install only the ones you need.
-
-## Skills
+Each skill is its own plugin, so you install only the ones you need. More are on the way.
 
 | Skill | What it does | Zip |
 |---|---|---|
-| [semantic-model-analyser](plugins/semantic-model-analyser/skills/semantic-model-analyser) | Reads a Power BI semantic model or its Power Query as text and reports on it. Needs Python 3.9+. | [Download](https://github.com/DataCraftersLab/dc-skills-public/releases?q=semantic-model-analyser&expanded=true) |
+| [semantic-model-analyser](plugins/semantic-model-analyser/skills/semantic-model-analyser) | Reads a Power BI semantic model or its Power Query as text and reports on it. | [Download](https://github.com/DataCraftersLab/skills/releases?q=semantic-model-analyser&expanded=true) |
+
+To add the whole marketplace in Claude Code:
+
+```
+/plugin marketplace add DataCraftersLab/skills
+```
+
+A downloaded zip does not update itself. The install commands above do.
 
 ## Contributing
 
