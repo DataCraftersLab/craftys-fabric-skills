@@ -1,0 +1,1958 @@
+/* Data Crafters documentation theme. Tokens carried verbatim from dc-panel/dc-tokens.css. */
+/* Rationale for every non-obvious value lives in README.md, not in here. */
+
+/* ============================================================ Tokens ======= */
+
+:root {
+  --color-background: #f4f6f8;
+  --color-foreground: #232e39;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #232e39;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #232e39;
+
+  --color-primary: #34383a;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #f7f8fa;
+  --color-secondary-foreground: #232e39;
+
+  --color-muted: #f7f8fa;
+  --color-muted-foreground: #69747f;
+
+  --color-accent: #e9f2e2;
+  --color-accent-foreground: #2c3a48;
+
+  --color-destructive: #d23b2c;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #e4e9ed;
+  --color-input: #d3dae0;
+  --color-ring: #58a545;
+
+  --color-brand: #34383a;
+  --color-brand-foreground: #58a545;
+  --color-hover: #eff1f4;
+
+  --color-dc-green: #58a545;
+  --color-positive: #15935a;
+  --color-positive-bg: #e4f3ea;
+  --color-negative: #d23b2c;
+  --color-negative-bg: #fbe8e5;
+  --color-warning: #e08a1e;
+  --color-warning-bg: #fbf0dd;
+  --color-info: #2f6fbf;
+  --color-info-bg: #e5eefa;
+
+  --color-chart-1: #34383a;
+  --color-chart-2: #73b761;
+  --color-chart-3: #ee9e64;
+  --color-chart-4: #ecc846;
+
+  /* Canvas is a touch cooler than the page, so an inset surface reads as depth. */
+  --color-canvas: #f0f3f5;
+  --color-canvas-dot: #d3dae0;
+
+  --code-keyword: #a24bc4;
+  --code-function: #2f6fbf;
+  --code-ref: #2f7d4f;
+  --code-string: #b4571c;
+  --code-number: #1b7c83;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-full: 9999px;
+
+  --space-xxs: 2px;
+  --space-xs: 4px;
+  --space-s-nudge: 6px;
+  --space-s: 8px;
+  --space-m-nudge: 10px;
+  --space-m: 12px;
+  --space-l: 16px;
+  --space-xl: 20px;
+  --space-xxl: 24px;
+  --space-xxxl: 32px;
+  --space-xxxxl: 48px;
+
+  --text-100: 10px;
+  --text-200: 12px;
+  --text-300: 14px;
+  --text-400: 16px;
+  --text-500: 20px;
+  --text-600: 24px;
+  --text-hero-700: 28px;
+  --text-hero-800: 32px;
+  --text-hero-900: 40px;
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --font-base: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system,
+    BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --font-heading: var(--font-base);
+  --font-numeric: Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system,
+    BlinkMacSystemFont, Roboto, sans-serif;
+  --font-code: 'Cascadia Code', 'Cascadia Mono', Consolas, 'SF Mono', ui-monospace, Menlo,
+    monospace;
+  --font-emoji: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', 'Segoe UI Symbol',
+    sans-serif;
+
+  --icon-100: 12px;
+  --icon-200: 16px;
+  --icon-300: 20px;
+  --icon-400: 24px;
+
+  --shadow-panel: inset 0 0 0 1px rgb(255 255 255 / 0.1), 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-card: 0 8px 24px -12px rgb(0 0 0 / 0.22);
+  --shadow-pop: 0 18px 44px -16px rgb(0 0 0 / 0.42);
+
+  --dc-gradient: linear-gradient(90deg, #34383a 0%, #34383a 34%, #48853a 72%, #58a545 100%);
+
+  /* Fixed length, not ch: ch resolves against each element's own font-size, so a
+     14px callout and a 16px paragraph would take visibly different right edges. */
+  --measure: 39rem;
+  --panel-h: 54px;
+  --sticky-offset: 86px;
+
+  /* Categorical accents, cycled by position. Generated in OKLCH, anchored on DC
+     green (h137) and spread evenly, so no two neighbours land on a similar hue. */
+  --a1-tint: #eaf9e4; --a1-edge: #c5e6b8; --a1-dot: #49941f; --a1-ink: #2e5d14;
+  --a2-tint: #dafcf9; --a2-edge: #9debe5; --a2-dot: #009e97; --a2-ink: #00625e;
+  --a3-tint: #dff7ff; --a3-edge: #aadfff; --a3-dot: #007dfb; --a3-ink: #0c528c;
+  --a4-tint: #f4efff; --a4-edge: #dbceff; --a4-dot: #8852fd; --a4-ink: #524189;
+  --a5-tint: #ffebfe; --a5-edge: #fec6f0; --a5-dot: #c144ac; --a5-ink: #753368;
+  --a6-tint: #ffecea; --a6-edge: #ffc8c4; --a6-dot: #d2484d; --a6-ink: #833032;
+  --a7-tint: #fff1dd; --a7-edge: #f6d4a7; --a7-dot: #b66b00; --a7-ink: #734400;
+  --a8-tint: #f1f7df; --a8-edge: #d5e1ad; --a8-dot: #778a00; --a8-ink: #4b5700;
+  --a0-tint: #f2f4f6; --a0-edge: #d6dbdf; --a0-dot: #878d93; --a0-ink: #5d646b;
+}
+
+/* Dark surfaces are a four-step graphite ramp, each step ~1.15:1 above the last. */
+/*   #1A1B1E page -> #24262A inset -> #2E3035 card -> #34383A hover */
+.dark {
+  --color-background: #1a1b1e;
+  --color-foreground: #f2f4f6;
+
+  --color-card: #2e3035;
+  --color-card-foreground: #f2f4f6;
+
+  --color-popover: #2e3035;
+  --color-popover-foreground: #f2f4f6;
+
+  --color-primary: #73b761;
+  --color-primary-foreground: #10231a;
+
+  --color-secondary: #33363b;
+  --color-secondary-foreground: #f2f4f6;
+
+  --color-muted: #2a2c30;
+  --color-muted-foreground: #9ba1a9;
+
+  --color-accent: #2f3a2c;
+  --color-accent-foreground: #cfe8c2;
+
+  --color-destructive: #e5614f;
+  --color-destructive-foreground: #1a1b1e;
+
+  --color-border: #3c3f45;
+  --color-input: #4a4d54;
+  --color-ring: #73b761;
+
+  --color-brand: #c9cdd0;
+  --color-brand-foreground: #73b761;
+  --color-hover: #34383a;
+
+  --color-dc-green: #73b761;
+  --color-positive: #4fb87a;
+  --color-positive-bg: #1f3428;
+  --color-negative: #e5614f;
+  --color-negative-bg: #38201c;
+  --color-warning: #e0a93e;
+  --color-warning-bg: #38301c;
+  --color-info: #7fb0e8;
+  --color-info-bg: #1e2b3a;
+
+  --color-chart-1: #c9cdd0;
+  --color-chart-2: #73b761;
+  --color-chart-3: #ee9e64;
+  --color-chart-4: #ecc846;
+
+  --color-canvas: #24262a;
+  --color-canvas-dot: #3a3d43;
+
+  --code-keyword: #c98fde;
+  --code-function: #7fb0e8;
+  --code-ref: #86c79a;
+  --code-string: #e0a97a;
+  --code-number: #7fd1cd;
+
+  --a1-tint: #273c23; --a1-edge: #445f3e; --a1-dot: #81c671; --a1-ink: #bee4b5;
+  --a2-tint: #033e3e; --a2-edge: #1b6262; --a2-dot: #00cdce; --a2-ink: #94e9e8;
+  --a3-tint: #0b3954; --a3-edge: #225c80; --a3-dot: #00bdff; --a3-ink: #98e1ff;
+  --a4-tint: #322f59; --a4-edge: #524f87; --a4-dot: #a79aff; --a4-ink: #cfceff;
+  --a5-tint: #462944; --a5-edge: #6e476b; --a5-dot: #e988e2; --a5-ink: #fac3f4;
+  --a6-tint: #4c2932; --a6-edge: #754752; --a6-dot: #fb88a5; --a6-ink: #ffc2d1;
+  --a7-tint: #4a2d1e; --a7-edge: #734c38; --a7-dot: #f69561; --a7-ink: #ffc9ad;
+  --a8-tint: #3d3515; --a8-edge: #62562c; --a8-dot: #ccaf3b; --a8-ink: #e7d89f;
+  --a0-tint: #343634; --a0-edge: #555854; --a0-dot: #9ca09b; --a0-ink: #ced2cd;
+}
+
+/* ============================================================== Base ====== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--sticky-offset);
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-base);
+  font-size: var(--text-300);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+input {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-code);
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+dl,
+dd,
+blockquote {
+  margin: 0;
+}
+
+a {
+  color: var(--color-dc-green);
+  text-decoration-color: color-mix(in srgb, var(--color-dc-green) 45%, transparent);
+  text-underline-offset: 2px;
+}
+a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* One visible focus ring everywhere. Removing it without a replacement is a bug. */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-input) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-input);
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-muted-foreground);
+}
+
+/* ========================================================= Primitives ==== */
+
+.dc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.dc-num {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+.dc-mono {
+  font-family: var(--font-code);
+}
+
+.dc-eyebrow {
+  font-size: var(--text-100);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted-foreground);
+}
+
+.dc-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dc-icon {
+  flex: none;
+  width: var(--icon-200);
+  height: var(--icon-200);
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.dc-icon.s {
+  width: var(--icon-100);
+  height: var(--icon-100);
+}
+.dc-icon.l {
+  width: var(--icon-300);
+  height: var(--icon-300);
+}
+.dc-icon.filled {
+  fill: currentColor;
+}
+
+.dc-glass {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background: color-mix(in srgb, var(--color-card) 85%, transparent);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-card);
+}
+
+.dc-accent-1 { --tint: var(--a1-tint); --edge: var(--a1-edge); --dot: var(--a1-dot); --ink: var(--a1-ink); }
+.dc-accent-2 { --tint: var(--a2-tint); --edge: var(--a2-edge); --dot: var(--a2-dot); --ink: var(--a2-ink); }
+.dc-accent-3 { --tint: var(--a3-tint); --edge: var(--a3-edge); --dot: var(--a3-dot); --ink: var(--a3-ink); }
+.dc-accent-4 { --tint: var(--a4-tint); --edge: var(--a4-edge); --dot: var(--a4-dot); --ink: var(--a4-ink); }
+.dc-accent-5 { --tint: var(--a5-tint); --edge: var(--a5-edge); --dot: var(--a5-dot); --ink: var(--a5-ink); }
+.dc-accent-6 { --tint: var(--a6-tint); --edge: var(--a6-edge); --dot: var(--a6-dot); --ink: var(--a6-ink); }
+.dc-accent-7 { --tint: var(--a7-tint); --edge: var(--a7-edge); --dot: var(--a7-dot); --ink: var(--a7-ink); }
+.dc-accent-8 { --tint: var(--a8-tint); --edge: var(--a8-edge); --dot: var(--a8-dot); --ink: var(--a8-ink); }
+.dc-accent-0 { --tint: var(--a0-tint); --edge: var(--a0-edge); --dot: var(--a0-dot); --ink: var(--a0-ink); }
+
+.dc-dot {
+  display: inline-block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--dot, var(--color-muted-foreground));
+}
+
+/* ============================================================== Panel ===== */
+/* A three-track grid, not a flex row, so the search sits on the panel's true
+   centre however wide the branding or the stat tiles get. */
+
+.dc-panel {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: var(--space-m) var(--space-l) var(--space-s);
+  background: var(--color-background);
+}
+
+.dc-bar {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 340px) 1fr;
+  align-items: center;
+  gap: 0 var(--space-l);
+  min-height: var(--panel-h);
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: var(--space-s) var(--space-xl);
+  border-radius: var(--radius-2xl);
+  background: var(--dc-gradient);
+  box-shadow: var(--shadow-panel);
+}
+
+.dc-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+  min-width: max-content;
+  flex: none;
+}
+.dc-brand img,
+.dc-brand svg {
+  height: 24px;
+  width: auto;
+}
+
+.dc-rule {
+  width: 1px;
+  height: 24px;
+  background: rgb(255 255 255 / 0.25);
+}
+
+.dc-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-400);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.dc-side {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+  justify-self: end;
+}
+
+.dc-stats {
+  display: flex;
+  align-items: center;
+}
+.dc-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s-nudge);
+  padding: 0 var(--space-m-nudge);
+  border-left: 1px solid rgb(255 255 255 / 0.15);
+}
+.dc-stat:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+.dc-stat:last-child {
+  padding-right: 0;
+}
+.dc-stat .dc-icon {
+  width: var(--icon-100);
+  height: var(--icon-100);
+  color: rgb(255 255 255 / 0.6);
+  stroke-width: 1.75;
+}
+.dc-stat-label {
+  font-size: var(--text-100);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgb(255 255 255 / 0.6);
+}
+.dc-stat-value {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-300);
+  font-weight: var(--weight-semibold);
+  color: #fff;
+}
+
+.dc-ghost {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s-nudge);
+  flex: none;
+  padding: var(--space-xs) var(--space-m);
+  border-radius: var(--radius-lg);
+  background: rgb(255 255 255 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.15);
+  font-size: var(--text-200);
+  font-weight: var(--weight-medium);
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+.dc-ghost:hover {
+  background: rgb(255 255 255 / 0.2);
+}
+
+.dc-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-lg);
+  background: rgb(255 255 255 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.15);
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+.dc-toggle:hover {
+  background: rgb(255 255 255 / 0.2);
+}
+
+/* Pinned to the toggle's 32px so the two ends of the panel line up, and because
+   the primary control must not be the smallest thing in the chrome. */
+.dc-search {
+  position: relative;
+  width: 100%;
+  justify-self: center;
+}
+.dc-search-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s-nudge);
+  height: 32px;
+  padding: 0 var(--space-m);
+  border-radius: var(--radius-lg);
+  background: rgb(255 255 255 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.15);
+}
+.dc-search-box:focus-within {
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.5);
+}
+.dc-search-box .dc-icon {
+  color: rgb(255 255 255 / 0.6);
+}
+.dc-search-box input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: var(--text-300);
+}
+.dc-search-box input:focus {
+  outline: none;
+}
+.dc-search-box input::placeholder {
+  color: rgb(255 255 255 / 0.45);
+}
+.dc-search-count {
+  flex: none;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-200);
+  color: rgb(255 255 255 / 0.6);
+}
+.dc-search-clear {
+  flex: none;
+  color: rgb(255 255 255 / 0.6);
+}
+.dc-search-clear:hover {
+  color: #fff;
+}
+
+/* The stats are glanceable context; the field is the control. */
+@media (max-width: 1279px) {
+  .dc-stats {
+    display: none;
+  }
+}
+@media (max-width: 720px) {
+  .dc-bar {
+    grid-template-columns: 1fr;
+    gap: var(--space-s);
+  }
+  .dc-side {
+    justify-self: start;
+  }
+  .dc-title,
+  .dc-rule {
+    display: none;
+  }
+}
+
+/* ============================================================== Shell ===== */
+
+.dc-shell {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  gap: var(--space-xxl);
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: var(--space-s) var(--space-l) var(--space-xxxxl);
+}
+.dc-shell.dc-shell-wide {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dc-toc {
+  position: sticky;
+  top: var(--sticky-offset);
+  align-self: start;
+  max-height: calc(100vh - var(--sticky-offset) - var(--space-xl));
+  overflow-y: auto;
+  padding-right: var(--space-s);
+}
+.dc-toc-head {
+  padding: var(--space-s) var(--space-s) var(--space-s-nudge);
+}
+.dc-toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.dc-toc a {
+  display: block;
+  padding: var(--space-s-nudge) var(--space-s);
+  border-left: 2px solid var(--color-border);
+  font-size: var(--text-200);
+  line-height: 1.4;
+  color: var(--color-muted-foreground);
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+.dc-toc a:hover {
+  background: var(--color-hover);
+  color: var(--color-foreground);
+}
+.dc-toc a[aria-current='true'] {
+  border-left-color: var(--color-dc-green);
+  color: var(--color-foreground);
+  font-weight: var(--weight-semibold);
+}
+.dc-toc .lvl-3 a {
+  padding-left: var(--space-xl);
+  font-size: var(--text-200);
+}
+.dc-toc-empty {
+  padding: var(--space-s);
+  font-size: var(--text-200);
+  color: var(--color-muted-foreground);
+}
+
+.dc-toc-trigger {
+  display: none;
+}
+
+/* Doc-set navigation. Two shapes share the rail: .dc-toc for a standalone page,
+   .dc-nav for a page inside a doc set. A folder is a <details>, so collapsing
+   costs no script; the current page's outline nests under its own link. */
+
+.dc-nav {
+  position: sticky;
+  top: var(--sticky-offset);
+  align-self: start;
+  max-height: calc(100vh - var(--sticky-offset) - var(--space-xl));
+  overflow-y: auto;
+  padding-right: var(--space-s);
+}
+
+.dc-nav-head {
+  padding: var(--space-s) var(--space-s) var(--space-s-nudge);
+}
+
+.dc-nav ul,
+.dc-nav ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dc-nav-group + .dc-nav-group,
+.dc-nav-group + .dc-nav-list,
+.dc-nav-list + .dc-nav-group {
+  margin-top: var(--space-xxs);
+}
+
+.dc-nav-group > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s-nudge) var(--space-s);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--text-200);
+  font-weight: var(--weight-semibold);
+  color: var(--color-foreground);
+}
+.dc-nav-group > summary::-webkit-details-marker {
+  display: none;
+}
+.dc-nav-group > summary:hover {
+  background: var(--color-hover);
+}
+/* Drawn here rather than left to the default marker, which sits outside the
+   padding box and so cannot be aligned against the section links below it. */
+.dc-nav-group > summary::before,
+.dc-nav-page > summary::before {
+  content: '';
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg) translate(-1px, -1px);
+  transition: transform 0.15s ease;
+}
+.dc-nav-group[open] > summary::before,
+.dc-nav-page[open] > summary::before {
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+/* A summary is three slots: an optional number, the name, an optional figure. */
+.dc-nav-num {
+  flex: none;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-100);
+  font-weight: 400;
+  opacity: 0.6;
+}
+.dc-nav-name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dc-nav-group-count {
+  margin-left: auto;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-100);
+  font-weight: 400;
+  color: var(--color-muted-foreground);
+}
+
+.dc-nav .dc-nav-list {
+  padding-left: var(--space-m);
+}
+
+.dc-nav-link {
+  display: block;
+  padding: var(--space-s-nudge) var(--space-s) var(--space-s-nudge) var(--space-m);
+  border-left: 2px solid var(--color-border);
+  font-size: var(--text-200);
+  line-height: 1.4;
+  color: var(--color-muted-foreground);
+  text-decoration: none;
+}
+.dc-nav-link:hover {
+  background: var(--color-hover);
+  border-left-color: var(--color-input);
+  color: var(--color-foreground);
+}
+.dc-nav-link[aria-current='page'] {
+  border-left-color: var(--color-dc-green);
+  background: var(--color-hover);
+  font-weight: var(--weight-semibold);
+  color: var(--color-foreground);
+}
+
+/* The outline only ever belongs to the page you are on, so it sits inside that
+   page's list item rather than in a pane of its own. */
+.dc-nav .dc-nav-outline {
+  padding-left: var(--space-m);
+}
+.dc-nav-outline a {
+  display: block;
+  padding: var(--space-xs) var(--space-s) var(--space-xs) var(--space-m);
+  border-left: 2px solid var(--color-border);
+  font-size: var(--text-200);
+  line-height: 1.4;
+  color: var(--color-muted-foreground);
+  text-decoration: none;
+}
+.dc-nav-outline a:hover {
+  background: var(--color-hover);
+  color: var(--color-foreground);
+}
+.dc-nav-outline a[aria-current='true'] {
+  border-left-color: var(--color-dc-green);
+  font-weight: var(--weight-semibold);
+  color: var(--color-foreground);
+}
+.dc-nav-outline .lvl-3 a {
+  padding-left: var(--space-xxl);
+}
+/* A page as a disclosure, for a rail that carries every page's sections and not
+   only the current page's. The name is not a link here: a link inside a summary
+   competes with the toggle, so the page itself is opened from the footer link
+   below its sections instead. */
+.dc-nav-page > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s-nudge) var(--space-s) var(--space-s-nudge) var(--space-m);
+  border-left: 2px solid var(--color-border);
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--text-200);
+  line-height: 1.4;
+  color: var(--color-muted-foreground);
+}
+.dc-nav-page > summary::-webkit-details-marker {
+  display: none;
+}
+.dc-nav-page > summary:hover {
+  background: var(--color-hover);
+  border-left-color: var(--color-input);
+  color: var(--color-foreground);
+}
+.dc-nav-page.is-current > summary {
+  border-left-color: var(--color-dc-green);
+  background: var(--color-hover);
+  font-weight: var(--weight-semibold);
+  color: var(--color-foreground);
+}
+.dc-nav-page.is-current > summary::after {
+  content: '';
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--color-dc-green);
+}
+
+.dc-nav-open a {
+  display: block;
+  padding: var(--space-xs) var(--space-s) var(--space-xs) var(--space-xxl);
+  font-size: var(--text-100);
+  font-weight: var(--weight-semibold);
+  color: var(--color-dc-green);
+  text-decoration: none;
+}
+.dc-nav-open a::after {
+  content: ' \2192';
+}
+.dc-nav-open a:hover {
+  background: var(--color-hover);
+}
+
+.dc-nav-empty {
+  padding: var(--space-s);
+  font-size: var(--text-200);
+  color: var(--color-muted-foreground);
+}
+
+/* The sheet. A document reads as a sheet on the page, not as the page itself. */
+.dc-sheet {
+  min-width: 0;
+  padding: var(--space-xxxl) var(--space-xxxl) var(--space-xxxxl);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background: var(--color-card);
+  color: var(--color-card-foreground);
+}
+
+@media (max-width: 1080px) {
+  .dc-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dc-toc-trigger {
+    display: flex;
+  }
+  .dc-toc,
+  .dc-nav {
+    position: fixed;
+    inset: var(--sticky-offset) auto var(--space-l) var(--space-l);
+    z-index: 45;
+    width: 280px;
+    max-height: none;
+    padding: var(--space-s);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    background: var(--color-popover);
+    box-shadow: var(--shadow-pop);
+    transform: translateX(calc(-100% - var(--space-xxl)));
+    transition: transform 0.22s ease;
+  }
+  body[data-toc-open='true'] .dc-toc,
+  body[data-toc-open='true'] .dc-nav {
+    transform: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .dc-shell {
+    padding: var(--space-s) var(--space-s) var(--space-xxxl);
+  }
+  .dc-sheet {
+    padding: var(--space-xl) var(--space-l) var(--space-xxxl);
+  }
+}
+
+.dc-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-m);
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 var(--space-l) var(--space-xxl);
+  font-size: var(--text-200);
+  color: var(--color-muted-foreground);
+}
+
+.dc-made-by {
+  font-size: var(--text-200);
+  color: var(--color-muted-foreground);
+}
+.dc-made-by .gradient {
+  font-weight: var(--weight-medium);
+  color: #7b41bc;
+  background-image: linear-gradient(100deg, #7b41bc 0%, #f02953 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.dc-made-by svg {
+  vertical-align: -2px;
+}
+
+.dc-to-top {
+  position: fixed;
+  right: var(--space-xl);
+  bottom: var(--space-xl);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--color-muted-foreground);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+.dc-to-top[data-visible='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.dc-to-top:hover {
+  color: var(--color-foreground);
+}
+
+/* ============================================================== Prose ===== */
+/* 16px body at 1.65, measured to about 74 characters. The 14px used in app chrome
+   is too tight for continuous reading at document width. */
+
+.dc-prose {
+  font-size: var(--text-400);
+  line-height: 1.65;
+  color: var(--color-card-foreground);
+}
+
+.dc-prose > * {
+  max-width: var(--measure);
+}
+.dc-prose > .dc-full,
+.dc-prose > figure,
+.dc-prose > table,
+.dc-prose > .dc-table-wrap,
+.dc-prose > .dc-grid,
+.dc-prose > .dc-code,
+.dc-prose > .dc-rail {
+  max-width: none;
+}
+
+.dc-prose h1 {
+  font-family: var(--font-heading);
+  font-size: var(--text-hero-800);
+  font-weight: var(--weight-semibold);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.dc-prose h1,
+.dc-prose h2,
+.dc-prose h3 {
+  max-width: none;
+}
+
+.dc-prose h2 {
+  margin-top: var(--space-xxxxl);
+  padding-top: var(--space-l);
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-heading);
+  font-size: var(--text-600);
+  font-weight: var(--weight-semibold);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+.dc-prose h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+.dc-prose h3 {
+  margin-top: var(--space-xxxl);
+  font-family: var(--font-heading);
+  font-size: var(--text-500);
+  font-weight: var(--weight-semibold);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.dc-prose h4 {
+  margin-top: var(--space-xxl);
+  font-size: var(--text-400);
+  font-weight: var(--weight-semibold);
+}
+.dc-prose h5 {
+  margin-top: var(--space-xl);
+  font-size: var(--text-300);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-foreground);
+}
+
+/* Base rhythm, so a component the list below forgets is still spaced. */
+.dc-prose > * + * {
+  margin-top: var(--space-l);
+}
+
+.dc-prose p,
+.dc-prose ul,
+.dc-prose ol,
+.dc-prose blockquote,
+.dc-prose figure,
+.dc-prose .dc-code,
+.dc-prose .dc-callout,
+.dc-prose .dc-grid,
+.dc-prose .dc-rail,
+.dc-prose .dc-steps,
+.dc-prose .dc-table-wrap,
+.dc-prose .dc-kv,
+.dc-prose .dc-props,
+.dc-prose .dc-chips,
+.dc-prose details {
+  margin-top: var(--space-l);
+}
+
+.dc-prose h1 + p,
+.dc-prose h2 + p,
+.dc-prose h3 + p,
+.dc-prose h4 + p {
+  margin-top: var(--space-m);
+}
+
+.dc-prose .dc-lede {
+  margin-top: var(--space-m);
+  font-size: var(--text-500);
+  font-weight: var(--weight-light);
+  line-height: 1.5;
+  color: var(--color-foreground);
+}
+
+.dc-prose .dc-note {
+  font-size: var(--text-300);
+  color: var(--color-muted-foreground);
+}
+
+.dc-prose ul,
+.dc-prose ol {
+  padding-left: var(--space-xxl);
+}
+.dc-prose li + li {
+  margin-top: var(--space-s);
+}
+.dc-prose li::marker {
+  color: var(--color-muted-foreground);
+}
+.dc-prose ul.dc-tight li + li,
+.dc-prose ol.dc-tight li + li {
+  margin-top: var(--space-xxs);
+}
+
+.dc-prose strong {
+  font-weight: var(--weight-semibold);
+}
+
+.dc-prose blockquote {
+  padding: var(--space-s) 0 var(--space-s) var(--space-l);
+  border-left: 3px solid var(--color-dc-green);
+  font-size: var(--text-400);
+  color: var(--color-foreground);
+}
+.dc-prose blockquote cite {
+  display: block;
+  margin-top: var(--space-s);
+  font-size: var(--text-200);
+  font-style: normal;
+  color: var(--color-muted-foreground);
+}
+
+.dc-prose hr {
+  margin: var(--space-xxxl) 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.dc-prose :not(pre) > code {
+  padding: 1px var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-secondary);
+  font-size: 0.875em;
+  white-space: nowrap;
+}
+
+.dc-prose kbd {
+  padding: 1px var(--space-s-nudge);
+  border: 1px solid var(--color-input);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-md);
+  background: var(--color-secondary);
+  font-size: 0.8125em;
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+.dc-prose figure figcaption,
+.dc-caption {
+  margin-top: var(--space-s);
+  font-size: var(--text-200);
+  line-height: 1.5;
+  color: var(--color-muted-foreground);
+}
+
+.dc-anchor {
+  margin-left: var(--space-s);
+  font-weight: var(--weight-regular);
+  color: var(--color-muted-foreground);
+  opacity: 0;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+:is(h2, h3, h4):hover > .dc-anchor,
+.dc-anchor:focus-visible {
+  opacity: 1;
+}
+
+/* =============================================================== Code ==== */
+
+.dc-code {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background: var(--color-secondary);
+}
+.dc-code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-m);
+  padding: var(--space-s-nudge) var(--space-m) var(--space-s-nudge) var(--space-m);
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-muted) 70%, transparent);
+}
+.dc-code-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-code);
+  font-size: var(--text-200);
+  color: var(--color-muted-foreground);
+}
+.dc-code-lang {
+  flex: none;
+  font-size: var(--text-100);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted-foreground);
+}
+
+/* pre, not pre-wrap: pasted TMDL/DAX/M arrives already indented, and soft
+   wrapping destroys that alignment. A long line scrolls, as it would in an editor. */
+.dc-code pre {
+  overflow-x: auto;
+  padding: var(--space-m) var(--space-l);
+  white-space: pre;
+  font-family: var(--font-code);
+  font-size: var(--text-200);
+  line-height: 1.65;
+  color: var(--color-card-foreground);
+  tab-size: 2;
+}
+.dc-code.dc-wrap pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.dc-copy {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: none;
+  padding: var(--space-xxs) var(--space-s);
+  border-radius: var(--radius-md);
+  font-size: var(--text-200);
+  font-weight: var(--weight-medium);
+  color: var(--color-muted-foreground);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.dc-copy:hover {
+  background: var(--color-hover);
+  color: var(--color-foreground);
+}
+.dc-copy[data-done='true'] {
+  color: var(--color-positive);
+}
+.dc-code:not(:has(.dc-code-head)) {
+  position: relative;
+}
+.dc-code:not(:has(.dc-code-head)) .dc-copy {
+  position: absolute;
+  top: var(--space-s);
+  right: var(--space-s);
+  background: color-mix(in srgb, var(--color-card) 80%, transparent);
+}
+/* The floating button sits over the code, so the first line has to end before it. */
+.dc-code:not(:has(.dc-code-head)) pre {
+  padding-right: 96px;
+}
+
+.tok-kw { font-weight: var(--weight-semibold); color: var(--code-keyword); }
+.tok-fn { font-weight: var(--weight-semibold); color: var(--code-function); }
+.tok-rf { color: var(--code-ref); }
+.tok-st { color: var(--code-string); }
+.tok-nu { color: var(--code-number); }
+.tok-cm { font-style: italic; color: var(--color-muted-foreground); }
+.tok-nm { color: var(--color-muted-foreground); }
+
+/* ============================================================ Callouts === */
+
+.dc-callout {
+  display: flex;
+  gap: var(--space-m);
+  padding: var(--space-m) var(--space-l);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-muted-foreground);
+  border-radius: var(--radius-xl);
+  background: var(--color-secondary);
+  font-size: var(--text-300);
+  line-height: 1.6;
+}
+.dc-callout > .dc-icon {
+  margin-top: 2px;
+  color: var(--color-muted-foreground);
+  stroke-width: 2.25;
+}
+.dc-callout-body {
+  min-width: 0;
+}
+.dc-callout-title {
+  font-size: var(--text-200);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted-foreground);
+}
+.dc-callout-title + * {
+  margin-top: var(--space-xs);
+}
+.dc-callout p + p {
+  margin-top: var(--space-s);
+}
+.dc-callout :not(pre) > code {
+  background: var(--color-card);
+}
+
+.dc-callout.note {
+  border-left-color: var(--color-info);
+  background: var(--color-info-bg);
+}
+.dc-callout.note > .dc-icon,
+.dc-callout.note .dc-callout-title {
+  color: var(--color-info);
+}
+
+.dc-callout.tip {
+  border-left-color: var(--color-positive);
+  background: var(--color-positive-bg);
+}
+.dc-callout.tip > .dc-icon,
+.dc-callout.tip .dc-callout-title {
+  color: var(--color-positive);
+}
+
+.dc-callout.warn {
+  border-left-color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+.dc-callout.warn > .dc-icon,
+.dc-callout.warn .dc-callout-title {
+  color: var(--color-warning);
+}
+
+.dc-callout.hazard {
+  border-left-color: var(--color-destructive);
+  background: var(--color-negative-bg);
+}
+.dc-callout.hazard > .dc-icon,
+.dc-callout.hazard .dc-callout-title {
+  color: var(--color-destructive);
+}
+
+.dc-callout.dc-decision {
+  border-left-color: var(--color-dc-green);
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+.dc-callout.dc-decision > .dc-icon,
+.dc-callout.dc-decision .dc-callout-title {
+  color: var(--color-dc-green);
+}
+
+/* ============================================================== Cards ==== */
+
+.dc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-m);
+}
+.dc-grid.cols-2 {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+.dc-grid.cols-4 {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.dc-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  padding: var(--space-l);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-secondary);
+}
+.dc-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+.dc-card-title {
+  font-size: var(--text-300);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
+  color: var(--color-card-foreground);
+}
+.dc-card-body {
+  font-size: var(--text-200);
+  line-height: 1.6;
+  color: var(--color-muted-foreground);
+}
+.dc-card.tinted {
+  border-color: var(--edge, var(--color-border));
+  background: var(--tint, var(--color-secondary));
+}
+.dc-card.tinted .dc-card-title {
+  color: var(--ink, var(--color-card-foreground));
+}
+.dc-card.tinted .dc-card-body {
+  color: color-mix(in srgb, var(--ink, var(--color-foreground)) 82%, transparent);
+}
+a.dc-card {
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+a.dc-card:hover {
+  border-color: var(--color-input);
+  background: var(--color-hover);
+}
+
+/* ============================================================== Stats ==== */
+/* One inset rail rather than loose figures: these are a read-out, not a headline. */
+
+.dc-rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: var(--space-s-nudge) var(--space-m);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-muted);
+}
+.dc-rail-stat {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+  padding: 0 var(--space-m);
+  border-left: 1px solid var(--color-border);
+}
+.dc-rail-stat:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+.dc-rail-stat:last-child {
+  padding-right: 0;
+}
+.dc-rail-value {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-400);
+  font-weight: var(--weight-semibold);
+  color: var(--color-foreground);
+}
+.dc-rail-label {
+  font-size: var(--text-100);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-muted-foreground);
+}
+
+.dc-meter {
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-input);
+}
+.dc-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-dc-green);
+}
+
+/* ============================================================= Badges ==== */
+
+.dc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  padding: var(--space-xxs) var(--space-s);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-secondary);
+  font-size: var(--text-200);
+  font-weight: var(--weight-medium);
+  line-height: 1.4;
+  color: var(--color-secondary-foreground);
+  white-space: nowrap;
+}
+.dc-badge.tinted {
+  border-color: var(--edge);
+  background: var(--tint);
+  color: var(--ink);
+  font-weight: var(--weight-semibold);
+}
+.dc-badge.solid {
+  border-color: transparent;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+.dc-badge.ok {
+  border-color: color-mix(in srgb, var(--color-positive) 30%, transparent);
+  background: color-mix(in srgb, var(--color-positive) 10%, transparent);
+  color: var(--color-positive);
+}
+.dc-badge.bad {
+  border-color: color-mix(in srgb, var(--color-destructive) 30%, transparent);
+  background: color-mix(in srgb, var(--color-destructive) 10%, transparent);
+  color: var(--color-destructive);
+}
+.dc-badge.warn {
+  border-color: color-mix(in srgb, var(--color-warning) 35%, transparent);
+  background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  color: var(--color-warning);
+}
+.dc-badge.green {
+  border-color: color-mix(in srgb, var(--color-dc-green) 35%, transparent);
+  background: color-mix(in srgb, var(--color-dc-green) 10%, transparent);
+  color: var(--color-dc-green);
+}
+.dc-badge.dc-mono {
+  font-family: var(--font-code);
+  font-size: var(--text-200);
+}
+
+.dc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+/* ============================================================= Tables ==== */
+/* A real <table>: a screen reader announces the column header with each cell,
+   which a div grid cannot do. */
+
+.dc-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.dc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-200);
+}
+.dc-table thead tr {
+  border-bottom: 1px solid var(--color-border);
+}
+.dc-table th {
+  padding: var(--space-s) var(--space-l);
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: var(--text-100);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-muted-foreground);
+  background: color-mix(in srgb, var(--color-muted) 70%, transparent);
+}
+.dc-table td {
+  padding: var(--space-s) var(--space-l);
+  vertical-align: top;
+  line-height: 1.55;
+  color: var(--color-card-foreground);
+}
+.dc-table tbody tr + tr {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+}
+.dc-table tbody tr:hover {
+  background: color-mix(in srgb, var(--color-hover) 50%, transparent);
+}
+/* Stat-table shape, declared once on the table so a header can never drift out of
+   step with its own column. Every column after the first right-aligns and shrinks
+   to its content, which puts each figure directly under its own label and gives
+   the slack to the first column. `num-last` does the same for one trailing figure.
+
+   :where() keeps these at class-only specificity, so a per-cell .center or .mono
+   below still overrides a single cell. */
+.dc-table.num-tail :where(th, td):not(:where(:first-child)),
+.dc-table.num-last :where(th, td):where(:last-child) {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+.dc-table.num-tail :where(td):not(:where(:first-child)),
+.dc-table.num-last :where(td):where(:last-child) {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+/* A colspan row spans the whole table, so it keeps the label column's alignment. */
+.dc-table :where(td, th)[colspan] {
+  width: auto;
+  text-align: left;
+  white-space: normal;
+}
+
+.dc-table td.mono,
+.dc-table th.mono {
+  font-family: var(--font-code);
+}
+.dc-table td.num,
+.dc-table th.num {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.dc-table td.center,
+.dc-table th.center {
+  text-align: center;
+}
+.dc-table td.nowrap {
+  white-space: nowrap;
+}
+.dc-table caption {
+  padding: var(--space-s) var(--space-l);
+  text-align: left;
+  font-size: var(--text-200);
+  color: var(--color-muted-foreground);
+}
+.dc-table tr.group td,
+.dc-table tr.group th {
+  background: color-mix(in srgb, var(--color-secondary) 60%, transparent);
+  font-size: var(--text-300);
+  font-weight: var(--weight-semibold);
+  color: var(--color-foreground);
+}
+
+/* Sticky header for a long listing. Needs a scroll container with a max height. */
+.dc-table-wrap.sticky {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.dc-table-wrap.sticky thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.dc-table-wrap.sticky th {
+  background: var(--color-card);
+}
+
+/* ======================================================= Definitions ===== */
+
+.dc-kv {
+  display: grid;
+  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
+  gap: var(--space-s) var(--space-l);
+  font-size: var(--text-300);
+}
+.dc-kv dt {
+  color: var(--color-muted-foreground);
+}
+.dc-kv dd {
+  overflow-wrap: break-word;
+  color: var(--color-foreground);
+}
+
+.dc-props {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+  gap: var(--space-xs) var(--space-m);
+  padding: var(--space-m) var(--space-l);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-secondary);
+  font-size: var(--text-200);
+}
+.dc-props dt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-code);
+  color: var(--color-muted-foreground);
+}
+.dc-props dd {
+  overflow-wrap: break-word;
+  font-family: var(--font-code);
+  color: color-mix(in srgb, var(--color-foreground) 85%, transparent);
+}
+
+@media (max-width: 720px) {
+  .dc-kv,
+  .dc-props {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xxs);
+  }
+  .dc-kv dd,
+  .dc-props dd {
+    margin-bottom: var(--space-s);
+  }
+}
+
+/* ============================================================== Steps ==== */
+
+.dc-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: dc-step;
+}
+.dc-prose .dc-steps {
+  padding-left: 0;
+}
+.dc-steps > li {
+  position: relative;
+  padding: 0 0 var(--space-xl) var(--space-xxxl);
+  border-left: 1px solid var(--color-border);
+  counter-increment: dc-step;
+}
+.dc-steps > li:last-child {
+  padding-bottom: 0;
+  border-left-color: transparent;
+}
+.dc-steps > li::before {
+  content: counter(dc-step);
+  position: absolute;
+  left: -13px;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  font-family: var(--font-numeric);
+  font-size: var(--text-200);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary-foreground);
+}
+.dc-steps .dc-step-title {
+  margin-top: 2px;
+  font-size: var(--text-400);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
+}
+.dc-prose .dc-steps > li + li {
+  margin-top: 0;
+}
+
+/* ============================================================ Details ==== */
+
+.dc-prose details {
+  padding: var(--space-s-nudge) var(--space-l);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-secondary);
+}
+.dc-prose summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s-nudge) 0;
+  cursor: pointer;
+  font-size: var(--text-300);
+  font-weight: var(--weight-semibold);
+  list-style: none;
+}
+.dc-prose summary::-webkit-details-marker {
+  display: none;
+}
+.dc-prose summary::before {
+  content: '';
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 1.5px solid var(--color-muted-foreground);
+  border-bottom: 1.5px solid var(--color-muted-foreground);
+  transform: rotate(-45deg) translate(-1px, -1px);
+  transition: transform 0.15s ease;
+}
+.dc-prose details[open] > summary::before {
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+.dc-prose details > :not(summary) {
+  margin-top: var(--space-m);
+}
+.dc-prose details[open] > summary {
+  margin-bottom: var(--space-xxs);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-m);
+}
+
+/* =============================================================== Tabs ==== */
+
+.dc-tabs {
+  display: flex;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-secondary);
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.dc-tab {
+  padding: var(--space-xs) var(--space-m);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-200);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  color: var(--color-muted-foreground);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.dc-tab:hover {
+  background: var(--color-hover);
+  color: var(--color-foreground);
+}
+.dc-tab[aria-selected='true'] {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+.dc-tabpanel[hidden] {
+  display: none;
+}
+
+/* ============================================================ Buttons ==== */
+
+.dc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-s);
+  padding: var(--space-m-nudge) var(--space-l);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-300);
+  text-decoration: none;
+  transition: background-color 0.2s ease, filter 0.2s ease, color 0.2s ease;
+}
+.dc-btn.primary {
+  background: var(--color-primary);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary-foreground);
+}
+.dc-btn.primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.dc-btn.secondary {
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  font-weight: var(--weight-medium);
+  color: var(--color-foreground);
+}
+.dc-btn.secondary:hover {
+  background: var(--color-hover);
+}
+.dc-btn.ghost {
+  font-weight: var(--weight-medium);
+  color: var(--color-muted-foreground);
+}
+.dc-btn.ghost:hover {
+  background: var(--color-hover);
+  color: var(--color-foreground);
+}
+.dc-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.dc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-s);
+  margin-top: var(--space-l);
+}
+
+/* =========================================================== Diagrams === */
+/* Inline SVG only. currentColor and the tokens below keep a figure theme-aware. */
+
+.dc-figure {
+  padding: var(--space-l);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  background: var(--color-canvas);
+}
+/* Author the viewBox at the width the figure will occupy: the SVG scales to the
+   container, so a 600-unit viewBox in a 1000px sheet renders every label at 1.7x. */
+.dc-figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.dc-figure .stroke {
+  stroke: var(--color-input);
+}
+.dc-figure .fill {
+  fill: var(--color-card);
+}
+.dc-figure .label {
+  font-family: var(--font-base);
+  font-size: 12px;
+  fill: var(--color-foreground);
+}
+.dc-figure .label.muted {
+  fill: var(--color-muted-foreground);
+}
+
+/* ============================================================= Search ==== */
+
+mark.dc-hit {
+  padding: 0 1px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-warning) 38%, transparent);
+  color: inherit;
+}
+mark.dc-hit[data-current='true'] {
+  background: var(--color-warning);
+  color: #1a1b1e;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-warning) 40%, transparent);
+}
+
+/* ============================================================ Motion ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation: none !important;
+  }
+}
+
+/* ============================================================== Print ==== */
+
+@media print {
+  .dc-panel,
+  .dc-toc,
+  .dc-nav,
+  .dc-to-top,
+  .dc-copy,
+  .dc-toc-trigger {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .dc-shell {
+    display: block;
+    padding: 0;
+    max-width: none;
+  }
+  .dc-sheet {
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: #fff;
+  }
+  .dc-prose {
+    font-size: 11pt;
+  }
+  .dc-prose > * {
+    max-width: none;
+  }
+  .dc-prose h2,
+  .dc-prose h3 {
+    break-after: avoid;
+  }
+  .dc-code,
+  .dc-callout,
+  .dc-table-wrap,
+  .dc-card,
+  figure {
+    break-inside: avoid;
+  }
+  /* A collapsed <details> prints collapsed, dropping its content with no trace.
+     Anything a reader hid is still part of the document on paper. */
+  details > *:not(summary) {
+    display: block !important;
+  }
+  details::details-content {
+    content-visibility: visible !important;
+  }
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 9pt;
+    color: #555;
+  }
+}

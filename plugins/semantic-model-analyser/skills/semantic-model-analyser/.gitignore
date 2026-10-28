@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Output of a run. A report belongs beside the model it describes, not in this folder.
+model-report/
+out/
+report.json
+*.html
+!sma/render/assets/*.html
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

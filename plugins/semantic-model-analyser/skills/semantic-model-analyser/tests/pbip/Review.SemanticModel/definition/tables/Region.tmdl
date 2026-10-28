@@ -1,0 +1,27 @@
+table Region
+	lineageTag: g1
+
+	measure 'Region Count' = COUNTROWS ( Region )
+		formatString: #,0
+		lineageTag: g2
+
+	column RegionKey
+		dataType: int64
+		isKey
+		summarizeBy: none
+		sourceColumn: RegionKey
+		lineageTag: g3
+
+	column Region
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Region
+		lineageTag: g4
+
+	partition Region = entity
+		mode: directLake
+		source
+			entityName: dim_region
+			schemaName: dbo
+			expressionSource: DatabaseQuery
+

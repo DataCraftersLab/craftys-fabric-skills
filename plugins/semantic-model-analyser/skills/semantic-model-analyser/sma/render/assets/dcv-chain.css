@@ -1,0 +1,182 @@
+/* dcv-chain — the folder rail, the chain canvas and the popover peek. */
+
+.dcvc { display: block; }
+.dcvc-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-m); margin-bottom: var(--space-s); flex-wrap: wrap;
+}
+.dcvc-segs {
+  display: inline-flex; border: 1px solid var(--color-input);
+  border-radius: var(--radius-full); overflow: hidden;
+}
+.dcvc-seg {
+  border: 0; background: var(--color-card); color: var(--color-foreground);
+  padding: 0 var(--space-m); height: 28px; cursor: pointer;
+  font: var(--weight-medium) var(--text-200)/1 var(--font-base);
+  border-right: 1px solid var(--color-input);
+}
+.dcvc-seg:last-child { border-right: 0; }
+.dcvc-seg:hover { background: var(--color-hover); }
+.dcvc-seg.on { background: var(--color-dc-green); color: #fff; }
+.dcvc-count { font-size: var(--text-200); color: var(--color-muted-foreground); }
+
+.dcvc-stage {
+  display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: var(--space-m);
+  align-items: stretch;
+}
+@media (max-width: 780px) { .dcvc-stage { grid-template-columns: 1fr; } }
+
+.dcvc-side {
+  display: flex; flex-direction: column; min-height: 0; max-height: 560px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-card); overflow: hidden;
+}
+.dcvc-side-head { padding: var(--space-s); border-bottom: 1px solid var(--color-border); }
+.dcvc-filter {
+  width: 100%; box-sizing: border-box; height: 28px; padding: 0 var(--space-m);
+  border: 1px solid var(--color-input); border-radius: var(--radius-full);
+  background: var(--color-background); color: var(--color-foreground);
+  font: var(--weight-regular) var(--text-200)/1 var(--font-base);
+}
+.dcvc-filter:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 1px; }
+.dcvc-rail { overflow: auto; padding: var(--space-xs); flex: 1 1 auto; }
+.dcvc .dcvc-rail-empty {
+  margin: var(--space-m); font-size: var(--text-200); color: var(--color-muted-foreground);
+}
+.dcvc-rail-group > summary {
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
+  padding: 5px var(--space-s); border-radius: var(--radius-md);
+  font-size: var(--text-200); font-weight: var(--weight-semibold);
+  list-style: none;
+}
+.dcvc-rail-group > summary::-webkit-details-marker { display: none; }
+/* Drawn from borders, not a glyph: the numeric face has no chevron, and the theme's
+   own `.dc-prose summary::before` draws one too -- so a `>` character landed rotated
+   under the theme's, which is the smudge that showed. */
+.dcvc .dcvc-rail-group > summary::before {
+  content: ""; flex: none; width: 6px; height: 6px; margin-right: 2px;
+  border: 1.5px solid var(--color-muted-foreground); border-left: 0; border-bottom: 0;
+  transform: rotate(45deg); transition: transform .12s ease;
+}
+.dcvc .dcvc-rail-group[open] > summary::before { transform: rotate(135deg); }
+/* `.dc-prose details[open] > summary` adds a padding-bottom and a rule under the open
+   folder. The reset cannot zero the padding without taking the closed state with it. */
+.dcvc .dcvc-rail-group[open] > summary { padding: 5px var(--space-s); }
+.dcvc-rail-group > summary:hover { background: var(--color-hover); }
+.dcvc-rail-dot { width: 8px; height: 8px; border-radius: var(--radius-full); flex: none; }
+.dcvc-rail-folder { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dcvc-rail-n {
+  margin-left: auto; font-family: var(--font-numeric); font-size: var(--text-100);
+  color: var(--color-muted-foreground); flex: none;
+}
+.dcvc .dcvc-rail-list { list-style: none; margin: 0 0 var(--space-xs); padding: 0 0 0 14px; }
+.dcvc-rail-item {
+  display: flex; align-items: center; gap: 6px; width: 100%; text-align: left;
+  border: 0; background: transparent; cursor: pointer;
+  padding: 4px var(--space-s); border-radius: var(--radius-md);
+  font-size: var(--text-200); color: var(--color-foreground);
+}
+.dcvc-rail-item:hover { background: var(--color-hover); }
+.dcvc-rail-item.on {
+  background: var(--color-accent); color: var(--color-accent-foreground);
+  font-weight: var(--weight-semibold);
+}
+.dcvc-rail-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.dcvc-main { position: relative; min-width: 0; }
+.dcvc-canvas {
+  position: relative; height: 560px; overflow: hidden; touch-action: none;
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background-color: var(--color-canvas);
+  background-image: radial-gradient(var(--color-canvas-dot) 1px, transparent 1px);
+  background-size: 22px 22px; cursor: grab;
+}
+.dcvc-canvas.dragging { cursor: grabbing; }
+.dcvc-canvas:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
+.dcvc-world { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.dcvc-edges { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; }
+.dcvc-edge { transition: stroke .12s ease, stroke-width .12s ease; }
+
+.dcvc-node {
+  position: absolute; box-sizing: border-box; z-index: 8;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 8px 12px; border: 1px solid; border-radius: var(--radius-lg);
+  cursor: pointer; overflow: hidden;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .04), 0 8px 20px -12px rgb(0 0 0 / .14);
+}
+.dcvc-node:hover { z-index: 9; }
+.dcvc-node:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
+.dcvc-node-name {
+  margin: 0; flex: none; font: var(--weight-semibold) var(--text-200)/1.3 var(--font-base);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dcvc .dcvc-node-sub {
+  margin: 3px 0 0; flex: none; font-size: var(--text-100); display: flex; gap: 8px;
+  align-items: center; overflow: hidden;
+}
+.dcvc-node-sub > span:first-child {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dcvc-n { font-family: var(--font-numeric); font-weight: var(--weight-semibold); flex: none; }
+
+/* `display:flex` on a class outranks the user-agent rule for [hidden], so without
+   this the empty-state stayed painted on top of a drawn chain. */
+.dcvc-empty[hidden], .dcvc-pop[hidden], .dcvc-full[hidden] { display: none; }
+.dcvc-empty {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  margin: 0; font-size: var(--text-200); color: var(--color-muted-foreground);
+  pointer-events: none;
+}
+
+/* The peek: a card next to what was clicked,
+   three or four facts, and NO SCROLL -- a popover that scrolls has outgrown the
+   job and should have been the panel, which is what the button offers. */
+.dcvc-pop {
+  position: absolute; z-index: 30; width: 300px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-xl);
+  background: var(--color-popover); box-shadow: var(--shadow-pop);
+  padding: var(--space-m); animation: dcvc-pop-in .14s ease;
+}
+@keyframes dcvc-pop-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .dcvc-pop { animation: none; } }
+.dcvc-pop-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-s);
+  margin-bottom: var(--space-xs);
+}
+.dcvc-pop-chip {
+  display: inline-block; padding: 2px 9px; border: 1px solid; border-radius: var(--radius-full);
+  font-size: var(--text-100); font-weight: var(--weight-medium);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dcvc .dcvc-pop-name {
+  margin: 0 0 var(--space-s); font-size: var(--text-300);
+  font-weight: var(--weight-semibold); line-height: 1.25;
+}
+.dcvc-fact {
+  display: flex; gap: var(--space-s); font-size: var(--text-200); padding: 2px 0;
+}
+.dcvc-fact-k { color: var(--color-muted-foreground); min-width: 66px; flex: none; }
+.dcvc-fact-v { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dcvc-pop-refs {
+  display: flex; gap: var(--space-m); margin: var(--space-s) 0;
+  font-size: var(--text-100); font-weight: var(--weight-semibold);
+}
+.dcvc-pop-actions { display: flex; gap: var(--space-xs); }
+.dcvc-pop-btn {
+  flex: 1 1 auto; cursor: pointer; padding: 5px var(--space-s);
+  border: 0; border-radius: var(--radius-md);
+  background: var(--color-secondary); color: var(--color-secondary-foreground);
+  font: var(--weight-medium) var(--text-200)/1.3 var(--font-base);
+}
+.dcvc-pop-btn:hover { background: var(--color-hover); }
+.dcvc-pop-btn.ghost {
+  background: transparent; border: 1px solid var(--color-border);
+  color: var(--color-muted-foreground);
+}
+.dcvc-full { z-index: 25; }
+
+@media (max-width: 780px) {
+  .dcvc-side { max-height: 220px; }
+  .dcvc-canvas { height: 440px; }
+}
+@media print { .dcvc-stage, .dcvc-bar { display: none; } }

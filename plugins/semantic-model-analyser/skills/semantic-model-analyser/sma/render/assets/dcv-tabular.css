@@ -1,0 +1,174 @@
+/* dcv-tabular -- the Ghost switcher, the stat stripe, and the grouped tables.
+
+   Selectors that answer a `.dc-prose` rule carry the `.dcvt` root as well as their own
+   class: the doc theme reaches inside a mount by descendant selector and a single class
+   loses to it. The mount-scoped reset in dcv-graph.css handles the rest. */
+
+.dcvt { display: block; }
+
+.dcvt-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-m); flex-wrap: wrap; margin-bottom: var(--space-m);
+}
+
+/* Variant 4, Ghost: no track, no rule, no fill. */
+.dcvt-views { display: flex; align-items: center; gap: var(--space-l); }
+.dcvt-view {
+  display: flex; align-items: center; gap: var(--space-xs); cursor: pointer;
+  border: 0; background: none; padding: 2px 0;
+  font: var(--weight-medium) var(--text-200)/1.4 var(--font-base);
+  color: var(--color-muted-foreground); transition: color .12s ease;
+}
+.dcvt-view:hover { color: var(--color-foreground); }
+.dcvt-view:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 3px; }
+.dcvt-view.on { color: var(--color-dc-green); font-weight: var(--weight-semibold); }
+.dcvt-view-dot {
+  width: 6px; height: 6px; border-radius: var(--radius-full); flex: none;
+  background: transparent; transition: background .12s ease;
+}
+.dcvt-view.on .dcvt-view-dot { background: var(--color-dc-green); }
+
+.dcvt-tools { display: flex; gap: var(--space-s); }
+.dcvt-all {
+  border: 0; background: none; cursor: pointer; padding: 2px 0;
+  font: var(--weight-medium) var(--text-100)/1.4 var(--font-base);
+  color: var(--color-muted-foreground); text-decoration: underline;
+  text-decoration-color: var(--color-border); text-underline-offset: 3px;
+}
+.dcvt-all:hover { color: var(--color-foreground); }
+
+/* The stripe. Counts, not ratios: a ratio hides how big the denominator is. */
+.dcvt-strip {
+  display: flex; flex-wrap: wrap; gap: var(--space-xl);
+  padding: var(--space-m) var(--space-l); margin-bottom: var(--space-m);
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-muted);
+}
+.dcvt-stat { display: flex; flex-direction: column; min-width: 96px; }
+.dcvt-stat-v {
+  font: var(--weight-semibold) var(--text-500)/1.1 var(--font-numeric);
+  color: var(--color-foreground);
+}
+.dcvt-stat.bad .dcvt-stat-v { color: var(--color-negative); }
+.dcvt-stat.warn .dcvt-stat-v { color: var(--color-warning); }
+.dcvt-stat.ok .dcvt-stat-v { color: var(--color-positive); }
+.dcvt-stat-l { font-size: var(--text-200); color: var(--color-foreground); margin-top: 2px; }
+.dcvt-stat-s { font-size: var(--text-100); color: var(--color-muted-foreground); }
+.dcvt .dcvt-help {
+  margin: 0; padding: var(--space-s) var(--space-m) var(--space-m);
+  font-size: var(--text-200); color: var(--color-muted-foreground);
+  border-bottom: 1px solid var(--color-border); max-width: 86ch;
+}
+.dcvt .dcvt-note {
+  margin: 0 0 var(--space-m); font-size: var(--text-200);
+  color: var(--color-muted-foreground);
+}
+
+/* Groups. A folder or a table is one <details>, so a 145-row list stays walkable. */
+.dcvt-groups { display: flex; flex-direction: column; gap: var(--space-xs); }
+.dcvt .dcvt-group {
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-card); overflow: hidden;
+}
+.dcvt .dcvt-group > summary {
+  display: flex; align-items: center; gap: var(--space-s); cursor: pointer;
+  padding: var(--space-s) var(--space-m); list-style: none;
+  font-size: var(--text-200); font-weight: var(--weight-semibold);
+}
+.dcvt .dcvt-group[open] > summary {
+  padding: var(--space-s) var(--space-m);
+  border-bottom: 1px solid var(--color-border);
+}
+.dcvt .dcvt-group > summary::-webkit-details-marker { display: none; }
+.dcvt .dcvt-group > summary::before {
+  content: ""; flex: none; width: 6px; height: 6px; margin-right: 2px;
+  border: 1.5px solid var(--color-muted-foreground); border-left: 0; border-bottom: 0;
+  transform: rotate(45deg); transition: transform .12s ease;
+}
+.dcvt .dcvt-group[open] > summary::before { transform: rotate(135deg); }
+.dcvt .dcvt-group > summary:hover { background: var(--color-hover); }
+.dcvt-dot { width: 9px; height: 9px; border-radius: var(--radius-full); flex: none; }
+.dcvt-g-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dcvt-g-meta {
+  font-size: var(--text-100); font-weight: var(--weight-regular);
+  color: var(--color-muted-foreground);
+}
+.dcvt-g-n {
+  margin-left: auto; flex: none; font-family: var(--font-numeric);
+  font-size: var(--text-100); color: var(--color-muted-foreground);
+}
+/* A folder where every row is documented is the rare case, so it is the one that gets
+   a colour. Everything else stays quiet -- 18 amber badges would say nothing. */
+.dcvt-g-n.ok { color: var(--color-positive); font-weight: var(--weight-semibold); }
+
+/* Tables. Own rules rather than .dc-table, because these are dense audit rows and the
+   prose table's padding turns 145 of them into a scroll marathon. */
+.dcvt-wrap { overflow-x: auto; }
+.dcvt-table {
+  width: 100%; border-collapse: collapse; table-layout: fixed;
+  font-size: var(--text-200);
+}
+.dcvt-table th {
+  text-align: left; padding: 6px var(--space-m); white-space: nowrap;
+  font-size: var(--text-100); font-weight: var(--weight-semibold);
+  letter-spacing: .04em; text-transform: uppercase;
+  color: var(--color-muted-foreground); border-bottom: 1px solid var(--color-border);
+}
+.dcvt-table td {
+  padding: 5px var(--space-m); border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+.dcvt-table tbody tr:last-child td { border-bottom: 0; }
+.dcvt-table tbody tr:hover { background: var(--color-hover); }
+.dcvt-r { text-align: right; font-family: var(--font-numeric); }
+.dcvt-num { font-family: var(--font-numeric); }
+.dcvt-blank { color: var(--color-muted-foreground); }
+.dcvt-code {
+  display: block; font-family: var(--font-code); font-size: var(--text-100);
+  color: var(--code-string); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.dcvt-code-inline {
+  font-family: var(--font-code); font-size: var(--text-100);
+  color: var(--code-string); background: var(--color-muted);
+  padding: 0 4px; border-radius: var(--radius-sm); white-space: nowrap;
+}
+.dcvt-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dcvt-prose { display: block; max-width: 62ch; }
+/* The column that takes the slack, so every other one stays under its own heading. */
+.dcvt-grow { width: 100%; }
+
+/* The Format dropdown word, outlined rather than filled: nine of them stacked in one
+   column reads as a colour chart if each carries a solid block. */
+.dcvt-level {
+  display: inline-block; padding: 1px 8px; border-radius: var(--radius-full);
+  font-size: var(--text-100); font-weight: var(--weight-semibold); white-space: nowrap;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.dcvt-level.warning { background: var(--color-warning-bg); color: var(--color-warning); }
+.dcvt-level.info { background: var(--color-info-bg); color: var(--color-info); }
+.dcvt-word {
+  display: inline-block; padding: 1px 8px; border: 1px solid; border-radius: var(--radius-full);
+  font-size: var(--text-100); font-weight: var(--weight-medium); white-space: nowrap;
+}
+
+/* The ribbon toggles. Square, monospaced and evenly sized so a column of them lines up
+   the way the ribbon does -- the point is to scan down for a missing $ or a stray %. */
+.dcvt-flags { display: inline-flex; gap: 3px; }
+.dcvt-flag {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; flex: none; font-style: normal; line-height: 1;
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  background: var(--color-muted); color: var(--color-foreground);
+  font-family: var(--font-numeric); font-size: var(--text-100);
+  font-weight: var(--weight-semibold);
+}
+/* A comma's ink sits below the baseline, so at the flag's own size it reads as an empty
+   box. Bigger, and lifted, so it reads as a comma. */
+.dcvt-flag.comma { font-size: var(--text-400); }
+.dcvt-flag.comma > span { transform: translateY(-0.3em); }
+
+@media (max-width: 720px) {
+  .dcvt-strip { gap: var(--space-l); }
+  .dcvt-prose { max-width: none; }
+}

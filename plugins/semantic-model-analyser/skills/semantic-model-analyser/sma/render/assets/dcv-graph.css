@@ -1,0 +1,242 @@
+/* dcv-graph — canvas chrome. Written against DC tokens; the node and folder
+   colours are inline, because they come from the app's own palette which carries
+   explicit dark values rather than deriving them. */
+
+.dcvg { display: block; }
+
+/* The doc theme styles prose by descendant selector, so `.dc-prose p`, `.dc-prose ul`,
+   `.dc-prose details` and `.dc-prose details[open] > summary` all reach inside a mount
+   and out-specify a single widget class. Left alone, a 16px prose margin on a node's
+   <p> overflowed a 62px node and flexbox shrank both lines to a 6px slice of text, and
+   the theme drew its own border chevron under the rail's. Each rule below ties the
+   theme rule it answers and wins on source order; widget rules that need to override
+   one of these carry the mount or root class to outweigh it. */
+.dcvg-mount :is(p, ul, ol, li, pre, details, summary) { margin: 0; }
+.dcvg-mount :is(ul, ol) { padding-left: 0; list-style: none; }
+.dcvg-mount details { padding: 0; border: 0; background: none; }
+.dcvg-mount details[open] > summary { margin: 0; border: 0; }
+.dcvg-mount summary::before { content: none; border: 0; transform: none; }
+
+.dcvg-toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-m);
+  flex-wrap: wrap; margin-bottom: var(--space-s);
+}
+.dcvg-search { display: flex; align-items: center; gap: var(--space-s); flex: 1 1 240px; }
+.dcvg-search-input {
+  flex: 1 1 auto; min-width: 0; height: 30px; padding: 0 var(--space-m);
+  border: 1px solid var(--color-input); border-radius: var(--radius-full);
+  background: var(--color-card); color: var(--color-foreground);
+  font: var(--weight-regular) var(--text-200)/1 var(--font-base);
+}
+.dcvg-search-input:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 1px; }
+.dcvg-search-count {
+  font-family: var(--font-numeric); font-size: var(--text-100);
+  color: var(--color-muted-foreground); white-space: nowrap;
+}
+.dcvg-tools { display: flex; align-items: center; gap: var(--space-xs); }
+.dcvg-btn, .dcvg-icon {
+  height: 30px; border: 1px solid var(--color-input); border-radius: var(--radius-full);
+  background: var(--color-card); color: var(--color-foreground); cursor: pointer;
+  font: var(--weight-medium) var(--text-200)/1 var(--font-base);
+}
+.dcvg-btn { padding: 0 var(--space-m); }
+.dcvg-icon { width: 30px; font-size: var(--text-300); line-height: 1; }
+.dcvg-btn:hover:not(:disabled), .dcvg-icon:hover { background: var(--color-hover); }
+.dcvg-btn:disabled { opacity: .45; cursor: default; }
+.dcvg-btn.on {
+  background: var(--color-dc-green); border-color: var(--color-dc-green); color: #fff;
+}
+
+.dcvg-results {
+  display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center;
+  margin-bottom: var(--space-s);
+}
+.dcvg-result {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+  padding: 3px 10px; border: 1px solid var(--color-border); border-radius: var(--radius-full);
+  background: var(--color-card); cursor: pointer; font-size: var(--text-200);
+  color: var(--color-foreground);
+}
+.dcvg-result:hover { background: var(--color-hover); }
+.dcvg-result-dot { width: 8px; height: 8px; border-radius: var(--radius-full); flex: none; }
+.dcvg-result-name { font-weight: var(--weight-medium); }
+.dcvg-result-meta { font-size: var(--text-100); color: var(--color-muted-foreground); }
+.dcvg-result-more, .dcvg-noresult {
+  font-size: var(--text-200); color: var(--color-muted-foreground); margin: 0;
+}
+
+.dcvg-stage { position: relative; display: flex; gap: 0; }
+
+.dcvg-canvas {
+  position: relative; flex: 1 1 auto; min-width: 0;
+  height: 560px; overflow: hidden; touch-action: none;
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background-color: var(--color-canvas);
+  background-image: radial-gradient(var(--color-canvas-dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  cursor: grab;
+}
+.dcvg-canvas.dragging { cursor: grabbing; }
+.dcvg-canvas:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
+
+.dcvg-world { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.dcvg-edges { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; }
+.dcvg-edge { transition: stroke .12s ease, opacity .12s ease; }
+
+.dcvg-group {
+  position: absolute; border: 1px solid; border-radius: var(--radius-xl);
+  box-sizing: border-box;
+}
+.dcvg-subgroup {
+  position: absolute; border: 1px solid; border-radius: var(--radius-lg);
+  box-sizing: border-box;
+}
+.dcvg-band { display: flex; align-items: center; }
+.dcvg-pill {
+  display: inline-flex; align-items: center; gap: 7px; max-width: 240px;
+  padding: 5px 12px; border: 1px solid; border-radius: var(--radius-full);
+  background: var(--color-card); box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+}
+.dcvg-pill-dot { width: 9px; height: 9px; border-radius: var(--radius-full); flex: none; }
+.dcvg-pill-label {
+  font: var(--weight-semibold) var(--text-200)/1 var(--font-base);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dcvg-pill-count {
+  font-family: var(--font-numeric); font-size: var(--text-100);
+  color: var(--color-muted-foreground);
+}
+
+.dcvg-node {
+  position: absolute; box-sizing: border-box; z-index: 8;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 10px 12px; border: 1px solid; border-radius: var(--radius-lg);
+  cursor: pointer; overflow: hidden;
+  transition: box-shadow .12s ease, opacity .12s ease;
+}
+.dcvg-node:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
+.dcvg-node.dimmed { opacity: .28; }
+.dcvg-node-name {
+  margin: 0; flex: none; font: var(--weight-semibold) var(--text-200)/1.32 var(--font-base);
+  color: var(--color-foreground);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.dcvg-mount .dcvg-node-sub {
+  margin: 4px 0 0; flex: none; font-size: var(--text-100); color: var(--color-muted-foreground);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Counts float into the first line rather than taking their own: the block is a
+   fixed height, so a second line of chrome would cost a line of name. */
+.dcvg-node-counts { float: right; display: inline-flex; gap: 6px; margin-left: 6px; }
+.dcvg-count { font-family: var(--font-numeric); font-size: var(--text-100); font-weight: var(--weight-semibold); }
+.dcvg-flag { font-size: var(--text-100); color: var(--color-muted-foreground); }
+
+/* The panel overlays the canvas rather than shrinking it: a graph that reflowed
+   on selection moved the node you just clicked out from under the pointer. */
+.dcvg-detail {
+  position: absolute; top: var(--space-s); right: var(--space-s); bottom: var(--space-s);
+  width: 340px; max-width: calc(100% - var(--space-xl));
+  overflow: auto; z-index: 20;
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-card); box-shadow: var(--shadow-pop);
+}
+.dcvg-detail-body { padding: var(--space-m) var(--space-l) var(--space-l); }
+.dcvg-detail-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-s);
+  margin-bottom: var(--space-s);
+}
+.dcvg-folder-chip {
+  display: inline-block; padding: 3px 10px; border: 1px solid; border-radius: var(--radius-full);
+  font-size: var(--text-100); font-weight: var(--weight-medium);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dcvg-close {
+  flex: none; width: 24px; height: 24px; border: 0; border-radius: var(--radius-full);
+  background: transparent; color: var(--color-muted-foreground); cursor: pointer;
+  font-size: var(--text-400); line-height: 1;
+}
+.dcvg-close:hover { background: var(--color-hover); color: var(--color-foreground); }
+.dcvg-mount .dcvg-detail-name {
+  margin: 0 0 var(--space-s); font-size: var(--text-400);
+  font-weight: var(--weight-semibold); line-height: 1.25;
+}
+.dcvg-mount .dcvg-detail-meta {
+  margin: 0 0 3px; font-size: var(--text-200); color: var(--color-muted-foreground);
+  display: flex; gap: var(--space-s);
+}
+.dcvg-detail-key { color: var(--color-muted-foreground); min-width: 78px; flex: none; }
+.dcvg-mount .dcvg-detail-desc { margin: var(--space-s) 0; font-size: var(--text-200); }
+.dcvg-section { margin-top: var(--space-m); }
+.dcvg-mount .dcvg-section-title {
+  margin: var(--space-m) 0 var(--space-xs); font-size: var(--text-100);
+  letter-spacing: .06em; text-transform: uppercase; font-weight: var(--weight-semibold);
+  color: var(--color-muted-foreground);
+}
+.dcvg-section-empty { margin: 0; font-size: var(--text-200); color: var(--color-muted-foreground); }
+.dcvg-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.dcvg-ref {
+  padding: 3px 9px; border: 1px solid; border-radius: var(--radius-full);
+  font-size: var(--text-100); cursor: pointer; color: var(--color-foreground);
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dcvg-ref.unknown { opacity: .55; cursor: default; }
+.dcvg-tag {
+  display: inline-block; padding: 2px 8px; border-radius: var(--radius-full);
+  background: var(--color-muted); color: var(--color-muted-foreground);
+  font-size: var(--text-100);
+}
+.dcvg-code {
+  margin: 0; padding: var(--space-m); max-height: 240px; overflow: auto;
+  background: var(--color-canvas); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-code); font-size: var(--text-100); line-height: 1.55;
+  white-space: pre;
+}
+.dcvg-code i { font-style: normal; }
+.dcvg-code i.k { color: var(--code-keyword); font-weight: var(--weight-semibold); }
+.dcvg-code i.f { color: var(--code-function); }
+.dcvg-code i.r { color: var(--code-ref); }
+.dcvg-code i.s { color: var(--code-string); }
+.dcvg-code i.n { color: var(--code-number); }
+.dcvg-code i.c { color: var(--color-muted-foreground); font-style: italic; }
+.dcvg-mount .dcvg-steps {
+  margin: 0; padding-left: var(--space-l); font-size: var(--text-200);
+  display: grid; gap: 2px;
+}
+.dcvg-steps li { color: var(--color-foreground); }
+.dcvg-steps li.dead { opacity: .55; text-decoration: line-through; }
+.dcvg-steps b { font-weight: var(--weight-semibold); }
+.dcvg-steps span { color: var(--color-muted-foreground); margin-left: 6px; font-size: var(--text-100); }
+
+.dcvg-mount .dcvg-hint {
+  margin: var(--space-s) 0 0; font-size: var(--text-100);
+  color: var(--color-muted-foreground);
+}
+
+@media (max-width: 720px) {
+  .dcvg-canvas { height: 420px; }
+  .dcvg-detail { width: auto; left: var(--space-s); }
+}
+/* A pan-and-zoom canvas prints as whatever happened to be on screen, which is
+   never the whole graph. The static charts carry the printed story. */
+@media print { .dcvg-stage, .dcvg-toolbar, .dcvg-results { display: none; } }
+
+/* --- focus collapses the pane; this is the way back to it ------------------ */
+.dcvg-detail-tab {
+  position: absolute; top: var(--space-s); right: var(--space-s); z-index: 21;
+  width: 26px; height: 34px; cursor: pointer;
+  border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  background: var(--color-card); color: var(--color-muted-foreground);
+  font-size: var(--text-400); line-height: 1;
+  box-shadow: var(--shadow-card);
+}
+.dcvg-detail-tab:hover { background: var(--color-hover); color: var(--color-foreground); }
+
+/* --- ranked suggestions ---------------------------------------------------- */
+.dcvg-result.active {
+  background: var(--color-hover); border-color: var(--color-ring);
+}
+.dcvg-result-why {
+  font-size: var(--text-100); color: var(--color-muted-foreground);
+  opacity: .8; font-style: italic; white-space: nowrap;
+}

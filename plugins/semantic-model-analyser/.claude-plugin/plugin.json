@@ -1,0 +1,9 @@
+{
+  "name": "semantic-model-analyser",
+  "version": "0.4.0",
+  "description": "Read a Power BI semantic model or its Power Query as text and report on it: measures, relationships, DAX dependency chains, query steps, native SQL and more. No Power BI Desktop or Fabric access needed.",
+  "author": {
+    "name": "Data Crafters"
+  },
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,11 @@
+role Dealer
+	modelPermission: read
+
+	tablePermission Region = Region[RegionKey] IN { 1, 2 } && [Region Count] > 0
+
+	tablePermission Sales
+		metadataPermission: none
+		columnPermission Margin = none
+
+	annotation PBI_Id = 60cc059991b6406b8cddd8cf22c21816
+

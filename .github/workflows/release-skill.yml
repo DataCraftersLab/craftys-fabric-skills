@@ -1,0 +1,48 @@
+# Zips each skill whose plugin.json version has no release yet, and attaches the zip to a
+# GitHub Release tagged <skill>-v<version>. Runs on merge to main, or by hand.
+name: Release skill zips
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "plugins/*/.claude-plugin/plugin.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Release new skill versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            name=$(jq -r .name "$manifest")
+            version=$(jq -r .version "$manifest")
+            tag="${name}-v${version}"
+            skill_dir="plugins/${name}/skills/${name}"
+
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "$tag already released"
+              continue
+            fi
+            if [ ! -f "${skill_dir}/SKILL.md" ]; then
+              echo "::error::${skill_dir}/SKILL.md not found"
+              exit 1
+            fi
+
+            zip_file="${name}-${version}.zip"
+            (cd "plugins/${name}/skills" && zip -qr "$GITHUB_WORKSPACE/${zip_file}" "${name}" -x '*/__pycache__/*' '*.pyc')
+
+            gh release create "$tag" "$zip_file" \
+              --title "${name} ${version}" \
+              --notes "Download ${zip_file}, then upload it to Claude.ai or Claude Desktop, or unzip it into your agent's skills folder. See the README for other install options."
+            echo "Released $tag"
+          done
