@@ -3101,7 +3101,7 @@ def doc_title():
     return subject() or "Semantic model analysis"
 
 
-PAGE_ORDER = ["index", "tmdl", "pq", "ai"]
+PAGE_ORDER = ["index", "tmdl", "pq", "ai", "refs"]
 
 #: `label` is the short name; the <title>, the chrome and the eyebrow are built from it
 #: and `doc_title()`, so a run's label reaches every page without three more literals.
@@ -3134,6 +3134,12 @@ PAGES = {
         "label": "AI readiness",
         "h1": "Is this model ready for AI?",
     },
+    "refs": {
+        "file": "references.html",
+        "nav": "References",
+        "label": "References",
+        "h1": "References",
+    },
 }
 
 #: Set by set_catalogue(). Off by default, because a report should carry the patterns
@@ -3150,7 +3156,7 @@ def set_catalogue(flag):
 def active_pages():
     """The pages this dataset can support, in rail order."""
     return (["index"] + (["tmdl"] if HAS_TMDL else []) + (["pq"] if HAS_M else [])
-            + (["ai"] if has_readiness() else []))
+            + (["ai"] if has_readiness() else []) + ["refs"])
 
 
 def has_readiness():
@@ -3175,12 +3181,15 @@ def pages(report):
         build_part_tmdl()
     if HAS_M:
         build_part_pq()
+    prepare_landing()
     APP = build_app_index()
     for key in active_pages():
         if key == "index":
             yield key, build_index()
         elif key == "ai":
             yield key, build_ai_page()
+        elif key == "refs":
+            yield key, build_refs_page()
         else:
             yield key, build_page(key)
 
@@ -3231,8 +3240,15 @@ def outline_of(key):
         return ([(2, "score", "At a glance")]
                 + [(2, "ai-" + g["key"], g["title"]) for g in ai["groups"]]
                 + [(2, "about", "About this checklist")])
+    if key == "refs":
+        return [(2, "links", "Links")]
     if key == "index":
-        return ([(2, "glance", "At a glance"), (2, "jump", "Go to")]
+        return ([(2, a, n) for a, n in (
+                    ("glance", "At a glance"), ("highlights", "What stands out"),
+                    ("health", "Model health"), ("lineage", "Data lineage"),
+                    ("mlineage", "Measure lineage"))
+                 if a == "glance" or a in LANDING]
+                + [(2, "first", "Look at first"), (2, "jump", "Go to")]
                 + [(2, "fed", "Input")]
                 + ([(2, "coverage", "Coverage")] if HAS_TMDL else [])
                 + [(2, "about", "About this analysis")])
@@ -3460,6 +3476,8 @@ def header_stats(key):
     if key == "ai":
         sm = REPORT["tmdl"]["aiReadiness"]["summary"]
         return stat_cells([("Pass", "%d/%d" % (sm["passed"], sm["total"]))])
+    if key == "refs":
+        return stat_cells([("Links", len(REFERENCES))])
     if key == "tmdl":
         n = sum(1 for f in fs if f["p"] == "tmdl")
         return stat_cells([("Findings", n), ("Measures", len(MEAS))])
@@ -3486,18 +3504,189 @@ BROWSE = [("table", "Tables"), ("measure", "Measures"), ("column", "Columns"),
           ("relationship", "Relationships"), ("query", "Queries"), ("role", "Roles"),
           ("calc group", "Calculation groups"), ("hierarchy", "Hierarchies")]
 
+#: Built once per render by build_index(); the landing page and its island read it.
+LINEAGE = None
+MLINEAGE = None
+#: The landing sections this run has content for. The outline reads it, so the rail never
+#: links to a section the page did not draw.
+LANDING = set()
 
-def browse_tiles():
+
+def prepare_landing():
+    global LINEAGE, MLINEAGE, LANDING
+    from . import overview
+    LINEAGE = overview.lineage(REPORT)
+    MLINEAGE = overview.measure_lineage(REPORT) if HAS_TMDL else None
+    written = {k: PAGES[k] for k in active_pages()}
+    LANDING = set()
+    if overview.highlights(REPORT, written, LINEAGE):
+        LANDING.add("highlights")
+    if has_readiness() or overview.checklist(REPORT, t_tmdl_checks() if HAS_TMDL else [],
+                                             q_m_checks() if HAS_M else [], LINEAGE):
+        LANDING.add("health")
+    if len(LINEAGE["nodes"]) >= 2:
+        LANDING.add("lineage")
+    if MLINEAGE and len(MLINEAGE["nodes"]) >= 2:
+        LANDING.add("mlineage")
+
+
+def stat_card(value, label, sub="", tone="", browse=None, href=None):
+    inner = ('<span class="sma-stat-v dc-num">%s</span><span class="sma-stat-l">%s</span>%s'
+             % (E(str(value)), E(label),
+                ('<span class="sma-stat-s">%s</span>' % E(sub)) if sub else ""))
+    cls = "sma-stat" + ((" t-" + tone) if tone else "")
+    if browse:
+        return ('<button type="button" class="%s" data-sma-browse="%s" title="Browse %s">%s</button>'
+                % (cls, E(browse), E(label.lower()), inner))
+    if href:
+        return '<a class="%s" href="%s">%s</a>' % (cls, E(href), inner)
+    return '<div class="%s">%s</div>' % (cls, inner)
+
+
+def stat_cards():
+    from . import overview
     counts = collections.Counter(o["k"] for o in (APP or {}).get("objects", []))
-    tiles = []
-    for k, label in BROWSE:
-        if not counts.get(k):
-            continue
-        tiles.append('<button type="button" class="sma-tile" data-sma-browse="%s">'
-                     '<span class="sma-tile-v dc-num">%s</span><span class="sma-tile-l">%s</span>'
-                     '<span class="sma-tile-a">Browse</span></button>'
-                     % (E(k), fmt(counts[k]), E(label)))
-    return '<div class="sma-tiles">%s</div>' % "".join(tiles)
+    cards_ = []
+    if HAS_TMDL:
+        auto = (LINEAGE or {}).get("autoDate", 0)
+        cards_.append(stat_card(len(TABS) - auto, "Tables",
+                                ("+%d auto date/time" % auto) if auto else "",
+                                "bad" if auto else "", browse="table"))
+        cards_.append(stat_card(len(MEAS), "Measures", "%d unreferenced" % len(UNREFERENCED)
+                                if UNREFERENCED else "", browse="measure"))
+        cards_.append(stat_card(len(COLS), "Columns",
+                                "%d calculated" % sum(1 for c in COLS if c["isCalculated"])
+                                if any(c["isCalculated"] for c in COLS) else "", browse="column"))
+        real = [r for r in REL if not (overview.is_auto_date(r["fromTable"])
+                                       or overview.is_auto_date(r["toTable"]))]
+        cards_.append(stat_card(len(real), "Relationships",
+                                ("+%d to auto date/time" % (len(REL) - len(real)))
+                                if len(REL) != len(real) else "",
+                                "warn" if not real and len(TABS) > 1 else "", browse="relationship"))
+    if HAS_M:
+        conns = {(s.get("label"), s.get("target"), s.get("database")) for q in QRY
+                 for s in q["sources"] if s.get("tier") == "connector"}
+        cards_.append(stat_card(len(QRY), "Queries", "%d steps" % MD["stepCount"], browse="query"))
+        cards_.append(stat_card(len(conns), "Data sources", ", ".join(sorted(
+            {s.get("label") for q in QRY for s in q["sources"] if s.get("tier") == "connector"}))[:40]))
+    fs = all_findings()
+    act = sum(1 for f in fs if f["lv"] in ("error", "warning"))
+    first = segment_pages()[0] if segment_pages() else None
+    cards_.append(stat_card(act, "To act on", "%d worth knowing" % (len(fs) - act),
+                            "warn" if act else "good",
+                            href=("%s#%s" % (PAGES[first]["file"],
+                                             "t-findings" if first == "tmdl" else "q-audit"))
+                            if first else None))
+    if has_readiness():
+        sm = REPORT["tmdl"]["aiReadiness"]["summary"]
+        ratio = sm["passed"] / max(1, sm["total"])
+        cards_.append(stat_card("%d/%d" % (sm["passed"], sm["total"]), "AI readiness", "checks pass",
+                                "good" if ratio >= 0.8 else ("warn" if ratio >= 0.5 else "bad"),
+                                href=PAGES["ai"]["file"]))
+    return '<div class="sma-stats dc-full">%s</div>' % "".join(cards_)
+
+
+def highlight_cards():
+    from . import overview
+    written = {k: PAGES[k] for k in active_pages()}
+    items = overview.highlights(REPORT, written, LINEAGE or {"nodes": [], "edges": []})
+    if not items:
+        return ""
+    return '<div class="sma-hl-grid dc-full">%s</div>' % "".join(
+        '<a class="sma-hl t-%s" href="%s"><span class="sma-hl-v dc-num">%s</span>'
+        '<span class="sma-hl-t">%s</span><span class="sma-hl-s">%s</span></a>'
+        % (tone, E(href), E(str(v)), E(text), E(sub)) for tone, v, text, sub, href in items)
+
+
+CHECK_MARK = {"pass": "✓", "warn": "!", "fail": "✗"}
+
+
+def health_panel():
+    from . import overview
+    rows = overview.checklist(REPORT, t_tmdl_checks() if HAS_TMDL else [],
+                              q_m_checks() if HAS_M else [], LINEAGE or {})
+    if not rows:
+        return ""
+    order = {"fail": 0, "warn": 1, "pass": 2}
+    rows = sorted(rows, key=lambda r: (order[r[4]], r[0]))
+    by = collections.Counter(r[4] for r in rows)
+
+    def row(g, label, v, tot, st):
+        return ('<li class="sma-ck %s"><span class="sma-ck-m" aria-label="%s">%s</span>'
+                '<span class="sma-ck-l">%s<small>%s</small></span>'
+                '<span class="sma-ck-n dc-num">%s/%s</span></li>'
+                % (st, {"pass": "Pass", "warn": "Close", "fail": "Not yet"}[st], CHECK_MARK[st],
+                   E(label), E(g), fmt(v), fmt(tot)))
+
+    shown = [r for r in rows if r[4] != "pass"]
+    passes = [r for r in rows if r[4] == "pass"]
+    lead = passes[:max(0, 8 - len(shown))]
+    rest = passes[len(lead):]
+    bar = "".join('<i class="sma-lv %s" style="flex-grow:%d"></i>'
+                  % ({"pass": "ok", "warn": "warn", "fail": "bad"}[k], by[k])
+                  for k in ("fail", "warn", "pass") if by.get(k))
+    more = ""
+    if rest:
+        more = ('<details class="sma-how"><summary>%d more passing</summary>'
+                '<ul class="sma-cklist">%s</ul></details>'
+                % (len(rest), "".join(row(*r) for r in rest)))
+    return ('<section class="sma-panel"><div class="sma-panel-h"><h3 data-dc-no-anchor>Checklist</h3>'
+            '<span class="sma-panel-n dc-num">%d of %d pass</span></div>'
+            '<div class="sma-lvbar" aria-hidden="true">%s</div>'
+            '<ul class="sma-cklist">%s</ul>%s</section>'
+            % (by.get("pass", 0), len(rows), bar, "".join(row(*r) for r in shown + lead), more))
+
+
+LINEAGE_TONES = [("db", "Database"), ("file", "Files and SharePoint"), ("web", "Web and APIs"),
+                 ("inline", "Entered data"), ("model", "Lakehouse and models"),
+                 ("calc", "DAX (calculated)"), ("mix", "Mixed"), ("measure", "Measures"),
+                 ("other", "Other")]
+
+
+def lineage_block(anchor, title, sub, g, legend_items, flags_note=""):
+    """One lineage graph: heading, legend, a scroll box the script draws into, and its data."""
+    legend = "".join('<span class="sma-lg"><i class="sma-lg-sw tone-%s"></i>%s</span>' % (k, E(l))
+                     for k, l in legend_items)
+    if any(n.get("hidden") for n in g["nodes"]):
+        legend += '<span class="sma-lg"><i class="sma-lg-sw dashed"></i>Hidden</span>'
+    if any(n.get("flag") for n in g["nodes"]):
+        legend += '<span class="sma-lg"><i class="sma-lg-sw flagged">!</i>Used by nothing</span>'
+    return ('<h2 id="%s">%s</h2><p class="sma-sub">%s</p>'
+            '<div class="sma-lin-bar dc-full">%s<span class="sma-fill"></span>'
+            '<button type="button" class="dc-btn secondary" data-sma-lin-reset="%s">Reset</button></div>'
+            '<div class="sma-lin-box dc-full"><div class="sma-lin" data-sma-lineage="%s-data">'
+            '<noscript><p class="dc-caption">The lineage graph needs script.</p></noscript></div></div>'
+            '<script type="application/json" id="%s-data">%s</script>'
+            % (anchor, E(title), sub + flags_note, legend, anchor, anchor, anchor, json_island(g)))
+
+
+def lineage_section():
+    g = LINEAGE
+    if "lineage" not in LANDING:
+        return ""
+    tones = {n["tone"] for n in g["nodes"]}
+    flags = any(n.get("flag") for n in g["nodes"])
+    return lineage_block(
+        "lineage", "Data lineage",
+        "Source to table to measures, left to right. Hover a node to trace it, click to pin, "
+        "double-click for its details.",
+        g, [(k, l) for k, l in LINEAGE_TONES if k in tones],
+        " Flagged nodes (<b>!</b>) are used by nothing in the model; a report visual may still "
+        "use them." if flags else "")
+
+
+def measure_lineage_section():
+    g = MLINEAGE
+    if "mlineage" not in LANDING:
+        return ""
+    sub = ("Table to measure to the measures built on them, left to right. Colour is the "
+           "display folder. Double-click a measure to open it.")
+    if g["shown"] < g["total"]:
+        sub += (" Showing %d of %d measures: the most-read and everything they depend on. "
+                "The chain explorer on the semantic model page reaches every one."
+                % (g["shown"], g["total"]))
+    return lineage_block("mlineage", "Measure lineage", sub, g,
+                       [("table", "Table")] + list(g["legend"]))
 
 
 def findings_panel():
@@ -3514,7 +3703,7 @@ def findings_panel():
                         "TMDL" if k == "tmdl" else "Power Query")
                      for k in segment_pages())
     top = fs[:8]
-    return ('<section class="sma-panel"><div class="sma-panel-h"><h3 data-dc-no-anchor>Look at first</h3>'
+    return ('<section class="sma-panel"><div class="sma-panel-h"><h3 data-dc-no-anchor>Findings</h3>'
             '<span class="sma-panel-n dc-num">%d findings</span></div>'
             '<div class="sma-lvbar" aria-hidden="true">%s</div><div class="sma-lv-legend">%s</div>'
             '<ul class="sma-flist">%s</ul><p class="sma-panel-f">%s</p></section>'
@@ -3563,32 +3752,42 @@ def jump_grid():
 
 
 def build_index():
-    """The page that connects the segments: a dashboard first, the run's method last."""
+    """The landing page: what wins attention first, then the way in, then the method."""
     segs = segment_pages()
     body = [
         '<p class="dc-eyebrow">%s</p>' % E(PAGES["index"]["label"]),
         "<h1>%s</h1>" % E(PAGES["index"]["h1"]),
         subject_block(),
-        '<p class="dc-lede">Read from the definition, never the data. %s finds any object; '
-        "the tiles below browse them by kind.</p>" % KBD_FIND,
+        '<p class="dc-lede">Read from the definition, never the data. %s finds any object.</p>'
+        % KBD_FIND,
         '<h2 id="glance">At a glance</h2>',
-        '<div class="sma-dash dc-full">%s<div class="sma-panels">%s%s</div></div>'
-        % (browse_tiles(), findings_panel(), readiness_panel() if has_readiness() else ""),
-        '<h2 id="jump">Go to</h2>',
-        jump_grid(),
-        '<h2 id="fed">Input</h2>',
-        '<ul class="sma-facts">%s</ul>' % "".join("<li>%s</li>" % parse_line(k) for k in segs),
+        stat_cards(),
     ]
-    notes = [d for d in ((REPORT or {}).get("input", {}).get("notes") or [])]
+    if "highlights" in LANDING:
+        body += ['<h2 id="highlights">What stands out</h2>', highlight_cards()]
+    health = health_panel()
+    if "health" in LANDING:
+        body += ['<h2 id="health">Model health</h2>',
+                 '<div class="sma-panels dc-full">%s%s</div>'
+                 % (health, readiness_panel() if has_readiness() else "")]
+    body.append(lineage_section())
+    body.append(measure_lineage_section())
+    body += ['<h2 id="first">Look at first</h2>',
+             '<div class="sma-panels sma-panels-1 dc-full">%s</div>' % findings_panel(),
+             '<h2 id="jump">Go to</h2>', jump_grid()]
+
+    method = ['<ul class="sma-facts">%s</ul>' % "".join("<li>%s</li>" % parse_line(k) for k in segs)]
+    notes = (REPORT or {}).get("input", {}).get("notes") or []
     if notes:
-        body.append('<ul class="sma-facts sma-muted">%s</ul>'
-                    % "".join("<li>%s</li>" % E(d) for d in notes))
+        method.append('<ul class="sma-facts sma-muted">%s</ul>'
+                      % "".join("<li>%s</li>" % E(d) for d in notes))
     if MERGED_AWAY:
-        body.append(merged_note())
+        method.append(merged_note())
+    body.append('<h2 id="fed">Input</h2>')
+    body.append("".join(method))
     if HAS_TMDL:
         body.append('<h2 id="coverage">Coverage</h2>')
         body.append(build_coverage())
-
     body.append('<h2 id="about">About this analysis</h2>')
     body.append(
         "<p>A run is handed TMDL, Power Query M, or both, and writes one page per segment it "
@@ -3611,6 +3810,38 @@ def build_index():
     body.append('<details class="sma-how dc-full"><summary>The rules these pages follow</summary>'
                 '<div class="sma-how-body">%s</div></details>' % build_rules())
     return render_shell("index", body)
+
+
+#: One list, no groups: name, what it is, link, the host shown on the card.
+REFERENCES = [
+    ("Data Crafters", "Microsoft data and AI consultancy", "https://datacrafters.io",
+     "datacrafters.io"),
+    ("Data Crafters on LinkedIn", "Company page", "https://www.linkedin.com/company/datacraftersio",
+     "LinkedIn"),
+    ("Khaled Chowdhury", "Data Crafters", "https://www.linkedin.com/in/khaledchowdhury/",
+     "LinkedIn"),
+    ("Fabric Data & AI Platform", "Knowledge hub for Microsoft Fabric, data and AI",
+     "https://fabricdataaiplatfrom.substack.com/", "Substack"),
+    ("Nikola Ilic", "Data Mozart", "https://data-mozart.com/about/", "data-mozart.com"),
+    ("Microsoft Learn", "Power BI documentation", "https://learn.microsoft.com/power-bi/",
+     "learn.microsoft.com"),
+]
+
+
+def build_refs_page():
+    body = [
+        '<p class="dc-eyebrow">%s</p>' % E(PAGES["refs"]["label"]),
+        "<h1>%s</h1>" % E(PAGES["refs"]["h1"]),
+        subject_block(),
+        '<p class="dc-lede">The people, places and documentation behind this analyser.</p>',
+        '<h2 id="links" class="dc-sr">Links</h2>',
+        '<div class="sma-refs-grid dc-full">%s</div>' % "".join(
+            '<a class="sma-refcard" href="%s" target="_blank" rel="noopener noreferrer">'
+            '<span class="sma-refcard-n">%s</span><span class="sma-refcard-r">%s</span>'
+            '<span class="sma-refcard-u">%s \u2197</span></a>' % (E(url), E(name), E(role), E(host))
+            for name, role, url, host in REFERENCES),
+    ]
+    return render_shell("refs", body)
 
 
 def view_section(anchor, heading, sub, content, label=None):
@@ -3685,8 +3916,9 @@ def build_page(seg):
 
 MARK = {"pass": "✓", "fail": "✗", "na": "–"}
 STATUS_WORD = {"pass": "Pass", "fail": "Not yet", "na": "Not in this input"}
-FOLLOW = ("This analyser is a Data Crafters skill, released free in the coming weeks. "
-          "Follow Data Crafters on LinkedIn to get it.")
+FOLLOW = ("This analyser is a free Data Crafters skill, published at "
+          "github.com/DataCraftersLab/craftys-fabric-skills. Follow Data Crafters on "
+          "LinkedIn for the next ones.")
 
 
 def ai_check_row(c):
@@ -3855,6 +4087,7 @@ TEMPLATE = """<!doctype html>
 
     <footer class="dc-footer">
       <span>Data Crafters</span>
+      <a href="references.html">References</a>
     </footer>
 
     <button type="button" class="dc-to-top dc-glass" data-dc-top aria-label="Back to top"></button>

@@ -1,7 +1,8 @@
 # Contributing
 
-The skill is one self-contained folder: Python 3.9 or later, standard library only, and
-it reads nothing outside its own folder.
+The skill is one self-contained folder: Python 3.9 or later, standard library only. It
+loads no code or assets from outside its own folder; it reads only the input it is given
+(and, for a named `definition` folder, the `VerifiedAnswers` folder beside it).
 
 ## Layout
 
@@ -11,6 +12,7 @@ it reads nothing outside its own folder.
 | `sma/tmdl_findings.py`, `sma/findings.py` | The rules, and the help line behind each finding code. |
 | `sma/dataset.py` | `report.json`, the contract every other part reads. |
 | `sma/ask.py` | `list` and `explain`, answered from the dataset. |
+| `sma/screen.py` | The credential screen every parsing command runs first. A new shape gets a pattern and a case in `tests/test_screen.py`, and must leave every bundled fixture clean. |
 | `sma/render/` | The HTML pages and the assets they inline. |
 | `tests/` | Unit tests, the parsers' own suites under `tests/parsers/`, and the browser checks. |
 

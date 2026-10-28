@@ -380,15 +380,17 @@ class TestRender(unittest.TestCase):
         # Any TMDL input also gets the AI readiness checklist; Power Query alone does not.
         self.assertEqual(sorted(self.render([FIX])),
                          ["ai-readiness.html", "index.html", "power-query.html",
-                          "semantic-model.html"])
+                          "references.html", "semantic-model.html"])
         # star-schema.tmdl carries two M partitions, so a TMDL-only run of the folder
         # reads that Power Query too. A model with no M in it gets no Power Query page.
         self.assertEqual(sorted(self.render(TMDL)),
                          ["ai-readiness.html", "index.html", "power-query.html",
-                          "semantic-model.html"])
+                          "references.html", "semantic-model.html"])
         self.assertEqual(sorted(self.render([FIX / "sample-sales-analytics.tmdl"])),
-                         ["ai-readiness.html", "index.html", "semantic-model.html"])
-        self.assertEqual(sorted(self.render(PQ)), ["index.html", "power-query.html"])
+                         ["ai-readiness.html", "index.html", "references.html",
+                          "semantic-model.html"])
+        self.assertEqual(sorted(self.render(PQ)),
+                         ["index.html", "power-query.html", "references.html"])
 
     def test_no_link_points_at_a_page_that_was_not_written(self):
         """A segment with no input is not a page with nothing in it -- it does not exist,
@@ -407,8 +409,13 @@ class TestRender(unittest.TestCase):
         file://, offline, in five years. One CDN reference ends that."""
         import re
         for html in self.render([FIX]).values():
-            for ref in re.findall(r'(?:src|href)\s*=\s*"([^"]+)"', html):
-                self.assertFalse(ref.startswith(("http:", "https:", "//")), ref)
+            # Anything the page loads. A plain <a href> is a link the reader may follow
+            # (the References page has four); it is not fetched when the page opens.
+            for tag in re.findall(r"<(?!a\s)[a-z]+\b[^>]*>", html):
+                for ref in re.findall(r'(?:src|href)\s*=\s*"([^"]+)"', tag):
+                    self.assertFalse(ref.startswith(("http:", "https:", "//")), ref)
+            for ref in re.findall(r'url\(\s*["\']?(https?:|//)', html):
+                self.fail("CSS loads %s" % ref)
 
     def test_no_control_bytes(self):
         """Heredocs and editors have both silently written a NUL into these files
