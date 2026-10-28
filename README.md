@@ -1,4 +1,4 @@
-# Crafty's Fabric Skills
+# <img src="docs/images/crafty.png" alt="Crafty" height="56" align="center"> Crafty's Fabric Skills
 
 <!-- BG&C: positioning, tagline and intro to be finalised. Working copy below. -->
 
@@ -33,7 +33,9 @@ Point Claude at a PBIP project, a folder of TMDL files, or a Power Query paste, 
 - "Where does this query's SQL actually run, and where does folding break?"
 - "Give me an HTML report I can hand to the team."
 
-<!-- BG&C: a screenshot or short clip of the HTML report goes here. -->
+![The report overview: counts, what stands out, and model health at a glance](docs/images/sma-overview.png)
+
+![A measure opened in the inspector: its DAX, what it reads, and what reads it](docs/images/sma-inspector.png)
 
 ### What you get
 
