@@ -230,6 +230,10 @@
     }
     var v = target.closest ? target.closest('.sma-view') : null;
     if (v && !allMode) show(v.getAttribute('data-view'), true);
+    for (var det = target.closest ? target.closest('details') : null; det;
+      det = det.parentElement ? det.parentElement.closest('details') : null) {
+      det.open = true;
+    }
     var isHead = v && target.matches('.sma-view-head h2');
     if (pick) {
       var buttons = $$('[data-anat-pick]', target);
@@ -986,6 +990,247 @@
     });
   }
 
+  /* =========================================================== Lineage ===== */
+
+  /* Source to measure, left to right. A node's column is its longest path from a
+     source, so a deep chain reads as depth; measure hosts take the last column. Rows
+     are ordered by the average row of each node's parents, which keeps most edges flat. */
+  var NODE_W = 196;
+  var NODE_H = 50;
+  var COL_W = 252;
+  var ROW_H = 64;
+  var PAD = 20;
+
+  function initLineage() {
+    $$('[data-sma-lineage]').forEach(drawLineage);
+  }
+
+  function drawLineage(mount) {
+    var key = mount.getAttribute('data-sma-lineage');
+    var island = D.getElementById(key);
+    if (!island) return;
+    var g;
+    try {
+      g = JSON.parse(island.textContent);
+    } catch (e) {
+      return;
+    }
+    if (!g.nodes || g.nodes.length < 2) return;
+    var byId = {};
+    var out = {};
+    var inc = {};
+    g.nodes.forEach(function (n) {
+      byId[n.id] = n;
+      out[n.id] = [];
+      inc[n.id] = [];
+    });
+    g.edges.forEach(function (e) {
+      if (!byId[e[0]] || !byId[e[1]]) return;
+      out[e[0]].push(e[1]);
+      inc[e[1]].push(e[0]);
+    });
+
+    var layer = {};
+    function depth(id, seen) {
+      if (layer[id] != null) return layer[id];
+      if (seen[id]) return 0;
+      seen[id] = true;
+      var d = 0;
+      inc[id].forEach(function (p) {
+        d = Math.max(d, depth(p, seen) + 1);
+      });
+      layer[id] = d;
+      return d;
+    }
+    g.nodes.forEach(function (n) {
+      depth(n.id, {});
+    });
+    var last = 0;
+    g.nodes.forEach(function (n) {
+      if (n.kind !== 'measures') last = Math.max(last, layer[n.id]);
+    });
+    g.nodes.forEach(function (n) {
+      if (n.kind === 'measures') layer[n.id] = last + 1;
+    });
+
+    var cols = [];
+    g.nodes.forEach(function (n) {
+      (cols[layer[n.id]] = cols[layer[n.id]] || []).push(n.id);
+    });
+    cols = cols.filter(Boolean);
+    var row = {};
+    cols.forEach(function (c) {
+      c.forEach(function (id, i) {
+        row[id] = i;
+      });
+    });
+    for (var sweep = 0; sweep < 3; sweep++) {
+      cols.forEach(function (c, ci) {
+        if (!ci) return;
+        c.sort(function (a, b) {
+          var avg = function (id) {
+            var ps = inc[id];
+            if (!ps.length) return row[id];
+            return ps.reduce(function (s, p) {
+              return s + row[p];
+            }, 0) / ps.length;
+          };
+          return avg(a) - avg(b);
+        });
+        c.forEach(function (id, i) {
+          row[id] = i;
+        });
+      });
+    }
+    var tallest = Math.max.apply(null, cols.map(function (c) {
+      return c.length;
+    }));
+    var pos = {};
+    cols.forEach(function (c, ci) {
+      var offset = (tallest - c.length) * ROW_H / 2;
+      c.forEach(function (id, i) {
+        pos[id] = { x: PAD + ci * COL_W, y: PAD + offset + i * ROW_H };
+      });
+    });
+    var W = PAD * 2 + (cols.length - 1) * COL_W + NODE_W;
+    var H = PAD * 2 + (tallest - 1) * ROW_H + NODE_H;
+
+    mount.textContent = '';
+    mount.style.width = W + 'px';
+    mount.style.height = H + 'px';
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = D.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'sma-lin-edges');
+    svg.setAttribute('width', W);
+    svg.setAttribute('height', H);
+    svg.setAttribute('aria-hidden', 'true');
+    mount.appendChild(svg);
+
+    var paths = [];
+    g.edges.forEach(function (e) {
+      var a = pos[e[0]];
+      var b = pos[e[1]];
+      if (!a || !b) return;
+      var x1 = a.x + NODE_W;
+      var y1 = a.y + NODE_H / 2;
+      var x2 = b.x;
+      var y2 = b.y + NODE_H / 2;
+      var mx = (x1 + x2) / 2;
+      var p = D.createElementNS(NS, 'path');
+      p.setAttribute('d', 'M' + x1 + ',' + y1 + ' C' + mx + ',' + y1 + ' ' + mx + ',' + y2 + ' ' + x2 + ',' + y2);
+      p.setAttribute('class', 'sma-le');
+      svg.appendChild(p);
+      paths.push({ a: e[0], b: e[1], el: p });
+    });
+
+    var els = {};
+    var pinned = null;
+    g.nodes.forEach(function (n) {
+      var d = el('div', 'sma-ln k-' + n.kind + ' tone-' + n.tone + (n.hidden ? ' is-hidden' : '') +
+        (n.flag ? ' is-flagged' : ''));
+      d.style.left = pos[n.id].x + 'px';
+      d.style.top = pos[n.id].y + 'px';
+      d.tabIndex = 0;
+      d.setAttribute('role', 'button');
+      d.setAttribute('aria-label', n.label + ', ' + n.meta + (n.flag ? ', ' + n.flag : ''));
+      if (n.flag) d.title = n.flag;
+      d.appendChild(el('span', 'sma-ln-n', n.label));
+      d.appendChild(el('span', 'sma-ln-m', n.meta));
+      if (n.flag) {
+        var f = el('span', 'sma-ln-flag', '!');
+        f.setAttribute('aria-hidden', 'true');
+        d.appendChild(f);
+      }
+      d.addEventListener('mouseenter', function () {
+        if (!pinned) trace(n.id);
+      });
+      d.addEventListener('mouseleave', function () {
+        if (!pinned) clear();
+      });
+      d.addEventListener('focus', function () {
+        if (!pinned) trace(n.id);
+      });
+      d.addEventListener('blur', function () {
+        if (!pinned) clear();
+      });
+      d.addEventListener('click', function (e) {
+        e.stopPropagation();
+        pinned = pinned === n.id ? null : n.id;
+        if (pinned) trace(n.id);
+        else clear();
+      });
+      d.addEventListener('dblclick', function () {
+        if (n.obj && BY[n.obj]) openObj(n.obj);
+      });
+      d.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && n.obj && BY[n.obj]) {
+          e.preventDefault();
+          openObj(n.obj);
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          d.click();
+        }
+      });
+      mount.appendChild(d);
+      els[n.id] = d;
+    });
+
+    function reach(id) {
+      var keep = {};
+      keep[id] = true;
+      (function up(x) {
+        inc[x].forEach(function (p) {
+          if (!keep[p]) {
+            keep[p] = true;
+            up(p);
+          }
+        });
+      })(id);
+      var down = {};
+      (function dn(x) {
+        out[x].forEach(function (c) {
+          if (!down[c]) {
+            down[c] = true;
+            keep[c] = true;
+            dn(c);
+          }
+        });
+      })(id);
+      return keep;
+    }
+    function trace(id) {
+      var keep = reach(id);
+      mount.classList.add('is-tracing');
+      Object.keys(els).forEach(function (k) {
+        els[k].classList.toggle('is-on', !!keep[k]);
+        els[k].classList.toggle('is-focus', k === id);
+      });
+      paths.forEach(function (p) {
+        p.el.classList.toggle('is-on', !!(keep[p.a] && keep[p.b]));
+      });
+    }
+    function clear() {
+      mount.classList.remove('is-tracing');
+      Object.keys(els).forEach(function (k) {
+        els[k].classList.remove('is-on', 'is-focus');
+      });
+      paths.forEach(function (p) {
+        p.el.classList.remove('is-on');
+      });
+    }
+    mount.addEventListener('click', function () {
+      pinned = null;
+      clear();
+    });
+    var reset = $('[data-sma-lin-reset="' + key.replace(/-data$/, '') + '"]');
+    if (reset) {
+      reset.addEventListener('click', function () {
+        pinned = null;
+        clear();
+      });
+    }
+  }
+
   /* ============================================================== Keys ===== */
 
   /* Capture phase on the window, so these win over the theme's own '/' and Ctrl+K
@@ -1053,6 +1298,7 @@
     initFindbar();
     initAiFilter();
     initHelp();
+    initLineage();
     initKeys();
     D.body.classList.add('sma-app');
     route();

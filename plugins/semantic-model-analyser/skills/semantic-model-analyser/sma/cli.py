@@ -10,7 +10,7 @@ import json
 import sys
 from pathlib import Path
 
-from . import __version__, ask, dataset, findings, inputs
+from . import __version__, ask, dataset, findings, inputs, screen
 
 LEVEL_MARK = {"error": "x", "warning": "!", "info": "-"}
 
@@ -20,7 +20,7 @@ def _config(args):
     return dataset.load_config(path) if path else None
 
 
-def gather(args):
+def gather(args, stop_on_credentials=True):
     """Everything handed over, whether it came from a path, a flag or a pipe.
 
     A paste out of the Power Query window is the common case, not the exotic one, so
@@ -38,7 +38,10 @@ def gather(args):
         if blob.strip():
             texts.append((blob, "stdin", "stdin", None))
     paths = [p for p in (args.paths or []) if p != "-"]
-    return inputs.resolve(paths, texts)
+    res = inputs.resolve(paths, texts)
+    if res["screen"] and stop_on_credentials and not getattr(args, "no_credential_check", False):
+        raise inputs.InputError(screen.refusal(res["screen"]))
+    return res
 
 
 def _out(path, text, quiet=False):
@@ -55,7 +58,7 @@ def cmd_inspect(args):
     contains no TMDL, or a paste that reads as SQL, is better found here than three
     stages later.
     """
-    res = gather(args)
+    res = gather(args, stop_on_credentials=False)
     print("mode      : %s" % inputs.describe(res))
     for kind in ("tmdl", "m"):
         for src in res[kind]:
@@ -66,6 +69,8 @@ def cmd_inspect(args):
     for note in res["notes"]:
         print("note      : %s" % note)
     print("parts     : %s" % ", ".join(k for k in ("tmdl", "m") if res[k]))
+    for line in screen.summary(res["screen"], len(res["tmdl"]) + len(res["m"])):
+        print("screen    : %s" % line)
     return 0
 
 
@@ -256,6 +261,9 @@ def main(argv=None):
                        help="read the text from stdin (or pass - as a path)")
         p.add_argument("--config", metavar="RULES.json",
                        help="thresholds, severity overrides and documented suppressions")
+        p.add_argument("--no-credential-check", action="store_true",
+                       help="skip the credential screen; only after the user has looked at "
+                            "every line it listed and confirmed none is a credential")
 
     p = sub.add_parser("inspect", help="say what would be read, and stop")
     shared(p)

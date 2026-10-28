@@ -31,5 +31,5 @@ whether a visual does is not knowable from the definition.
 by one kind of finding only: text the parser could not read.
 """
 
-__version__ = "0.4.0"
+__version__ = "1.0.0"
 __all__ = ["compare", "dataset", "findings", "inputs"]

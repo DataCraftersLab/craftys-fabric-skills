@@ -38,6 +38,7 @@ import hashlib
 import os
 from pathlib import Path
 
+from . import screen
 from .vendor import m_parser
 from .vendor.m_parser import Model as MModel
 from .vendor.tmdl_parser import Model as TmdlModel
@@ -341,8 +342,9 @@ def resolve(paths=(), texts=()):
             "M may be a whole section document, a labelled dump, one Advanced Editor "
             "paste, a bare function or a single parameter.%s"
             % (given, ("\nWhat was looked at: " + "; ".join(notes)) if notes else ""))
+    # Only what will be parsed is screened: a skipped file is never copied anywhere.
     return {"mode": mode, "tmdl": tmdl, "m": m, "sources": sources, "notes": notes,
-            "given": describe_given(paths, texts)}
+            "given": describe_given(paths, texts), "screen": screen.scan(tmdl + m)}
 
 
 def describe_given(paths=(), texts=()):
