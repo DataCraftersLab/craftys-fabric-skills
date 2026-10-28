@@ -1,4 +1,4 @@
-# Data Crafters Skills
+# Crafty's Fabric Skills
 
 <!-- BG&C: positioning, tagline and intro to be finalised. Working copy below. -->
 
@@ -10,12 +10,12 @@ Each skill is its own plugin, so you install only the ones you need. More are on
 
 | Skill | What it does | Zip |
 |---|---|---|
-| [semantic-model-analyser](plugins/semantic-model-analyser/skills/semantic-model-analyser) | Reads a Power BI semantic model or its Power Query as text and reports on it. | [Download](https://github.com/DataCraftersLab/skills/releases?q=semantic-model-analyser&expanded=true) |
+| [semantic-model-analyser](plugins/semantic-model-analyser/skills/semantic-model-analyser) | Reads a Power BI semantic model or its Power Query as text and reports on it. | [Download](https://github.com/DataCraftersLab/craftys-fabric-skills/releases?q=semantic-model-analyser&expanded=true) |
 
 To add the whole marketplace in Claude Code:
 
 ```
-/plugin marketplace add DataCraftersLab/skills
+/plugin marketplace add DataCraftersLab/craftys-fabric-skills
 ```
 
 A downloaded zip does not update itself. The install commands do.
@@ -48,18 +48,18 @@ It reads the model's text only. It never connects to the model and never sees a 
 
 ### Install
 
-Claude.ai and Claude Desktop: download the zip from [Releases](https://github.com/DataCraftersLab/skills/releases?q=semantic-model-analyser&expanded=true) and upload it under Settings, Capabilities, Skills.
+Claude.ai and Claude Desktop: download the zip from [Releases](https://github.com/DataCraftersLab/craftys-fabric-skills/releases?q=semantic-model-analyser&expanded=true) and upload it under Settings, Capabilities, Skills.
 
 Claude Code:
 
 ```
-/plugin install semantic-model-analyser --marketplace DataCraftersLab/skills
+/plugin install semantic-model-analyser --marketplace DataCraftersLab/craftys-fabric-skills
 ```
 
 Codex, Copilot, Cursor, Gemini CLI and other agents:
 
 ```
-npx skills add DataCraftersLab/skills --skill semantic-model-analyser
+npx skills add DataCraftersLab/craftys-fabric-skills --skill semantic-model-analyser
 ```
 
 Full documentation: [the skill's README](plugins/semantic-model-analyser/skills/semantic-model-analyser/README.md).

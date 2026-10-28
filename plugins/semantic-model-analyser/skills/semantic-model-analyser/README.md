@@ -255,7 +255,7 @@ Do not hand-edit the output. Change the source and re-render.
 In Claude Code:
 
 ```
-/plugin install semantic-model-analyser --marketplace DataCraftersLab/skills
+/plugin install semantic-model-analyser --marketplace DataCraftersLab/craftys-fabric-skills
 ```
 
 For any other agent that reads the Agent Skills format, copy the whole folder into its skills directory:
