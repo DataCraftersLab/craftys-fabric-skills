@@ -9,8 +9,8 @@
   },
   "plugins": [
     {
-      "name": "semantic-model-analyser",
-      "source": "./plugins/semantic-model-analyser",
+      "name": "semantic-model-analyzer",
+      "source": "./plugins/semantic-model-analyzer",
       "description": "Read a Power BI semantic model or its Power Query as text and report on it. No Power BI Desktop or Fabric access needed."
     }
   ]

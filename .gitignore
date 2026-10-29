@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Output of a skill run. A report belongs beside the model it describes, not in this repository.
+sma-report/
+model-report/
+out/
+report.json
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
