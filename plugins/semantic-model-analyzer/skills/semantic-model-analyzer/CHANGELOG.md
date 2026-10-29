@@ -4,6 +4,13 @@
 
 Changes from the first reviews of 1.0.0. Thank you to everyone who tested it.
 
+**Renamed**
+
+- The skill is now Semantic Model Analyzer, `semantic-model-analyzer` (it was
+  `semantic-model-analyser`). Anyone who installed the old name installs the new one.
+- `report.json` files written by 1.0.0 still load, and `analyze` is accepted as a spelling
+  of the `analyse` command.
+
 **Fixed**
 
 - A Windows console on code page 1252 no longer ends the run with exit 1 on a measure
