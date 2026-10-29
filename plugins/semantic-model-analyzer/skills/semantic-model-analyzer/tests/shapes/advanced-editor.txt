@@ -1,6 +1,0 @@
-let
-    Source = Sql.Database("reporting-01", "Sales", [Query="SELECT OrderId, Amount, OrderDate#(lf)FROM dbo.Orders#(lf)WHERE OrderDate >= '2024-01-01'"]),
-    #"Changed Type" = Table.TransformColumnTypes(Source, {{"OrderDate", type date}}),
-    #"Filtered Rows" = Table.SelectRows(#"Changed Type", each [Amount] > 0)
-in
-    #"Filtered Rows"

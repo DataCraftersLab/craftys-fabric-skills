@@ -90,8 +90,10 @@ def _downstream(measures, name):
 
 def diff_reports(before, after):
     out = {"before": {"label": before.get("label"), "generatedAt": before.get("generatedAt"),
+                      "subject": before.get("input", {}).get("subject"),
                       "digest": before.get("input", {}).get("digest")},
            "after": {"label": after.get("label"), "generatedAt": after.get("generatedAt"),
+                     "subject": after.get("input", {}).get("subject"),
                      "digest": after.get("input", {}).get("digest")},
            "parts": {}}
     if "tmdl" in before and "tmdl" in after:
@@ -145,9 +147,14 @@ def _diff_findings(before, after):
             "resolved": sorted("%s: %s" % k for k in a - b)}
 
 
+def _side(s):
+    # The name first: a header of two timestamps did not say which version was which.
+    name = s.get("label") or s.get("subject") or "unnamed"
+    return "%s  (generated %s)" % (name, s.get("generatedAt"))
+
+
 def format_text(d):
-    lines = ["before  %s  %s" % (d["before"].get("generatedAt"), d["before"].get("label") or ""),
-             "after   %s  %s" % (d["after"].get("generatedAt"), d["after"].get("label") or ""), ""]
+    lines = ["before  %s" % _side(d["before"]), "after   %s" % _side(d["after"]), ""]
     for part, body in d["parts"].items():
         lines.append("== %s" % part)
         header_at = len(lines)

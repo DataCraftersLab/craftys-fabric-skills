@@ -252,6 +252,17 @@ one nobody can audit. `report.json` records the configuration under `config`.
 
 For anything on that list, connect to the model instead.
 
+## Known limits
+
+- **A Power Query step named like a TMDL keyword** (lower-case `database`, `model`,
+  `table`, `column`, `partition`, `role` and the like) cuts that expression short when it
+  is read from a `.tmdl` file. The Direct Lake template `let database = Sql.Database(...)
+  in database` is the usual case. The rest of the model reads normally; to read that
+  expression, paste its M with `--m-text`.
+- **DAX user-defined functions** (`functions.tmdl`) are not read yet. `inspect` says so.
+- **Not read**: `.pbix`, `.zip`, `model.bim` and a PBIP's `.Report` folder. Save the model
+  as a PBIP with TMDL, or export TMDL.
+
 ## The HTML
 
 The pages are a report about the model. They describe what was read and what it means,
@@ -261,8 +272,8 @@ explorer, the findings table, the anatomy rail) carry no instructions.
 Theme, script and logo are inlined and the pages make **zero network requests**, so they
 open from `file://`, survive being emailed, and still work in five years. Light and dark
 both come from the theme's tokens — a hardcoded hex would survive a theme toggle and go
-invisible in one of the two, which is why `tests/validate_html.py` checks for it in a
-real browser rather than trusting the source.
+invisible in one of the two, which is why every release is checked in a real browser in
+both themes rather than trusted from the source.
 
 Every page says what it is about, under its heading: the PBIP project, the TMDL file or
 the Power Query file, with its path, or the `--label` when one was given.
@@ -297,35 +308,11 @@ cp -r semantic-model-analyzer <skills directory>/semantic-model-analyzer
 for it, and the body tells Claude how to run it and what it may not claim. The detail it
 loads on demand is in `references/`.
 
-## Tests
-
-```bash
-python -m unittest discover -s tests -t .     # 141 tests, no dependencies
-python tests/parsers/test_tmdl_parser.py      # 132 checks on the vendored TMDL parser
-python tests/parsers/test_m_parser.py         # 148 checks on the vendored M parser
-python tests/validate_html.py                 # 110 browser checks per model, both themes
-python tests/validate_html.py out/            # the same checks on pages already written
-```
-
-The browser checks need `pip install playwright && playwright install chromium`. They are
-separate because they need that, and because opening three pages in two themes is slow
-enough to be a deliberate act. Each one exists because the thing it checks for actually
-happened here at least once, and none of them were visible in the HTML source.
-
-`tests/pbip/Review.SemanticModel` is a small PBIP built to carry every object the external
-review asked about: active, inactive, bidirectional and many-to-many relationships, one
-naming an undeclared table, a calculation group beside a hand-written PY measure, a role
-with RLS and OLS, a Direct Lake entity, a composite DirectQuery entity, shared expressions
-including a parameter and a `Value.NativeQuery` with `EnableFolding`, a model block that
-discourages implicit measures, a culture, a measure whose DAX did not come through, and a
-description holding `</script><script>`.
-
 ## Layout
 
 ```
 SKILL.md                  the Claude Code entry point
 references/               commands, findings and page guides SKILL.md loads on demand
-CONTRIBUTING.md           layout, the test commands, the rules the code holds to
 sma/
   cli.py                  inspect | dataset | analyse | render | report | diff | list | explain
   inputs.py               what to read, and which segments that supports
@@ -340,22 +327,16 @@ sma/
   render/                 the pages (cards.py, the finder index in app.py, the landing
                           page and lineage in overview.py) and the assets they inline
   vendor/                 the TMDL and M parsers
-tests/
-  fixtures/               a sample model and a sample query dump
-  shapes/                 one file per shape of input, for the routing tests
-  pbip/                   the review fixture, a small PBIP definition
-  parsers/                the parsers' own suites
-  test_pipeline.py        the pipeline, end to end
-  test_review.py          one test per item of the external review
-  validate_html.py        the standing checks, in a browser
 ```
+
+The skill holds only what runs. Its tests, the parser suites and the browser checks are
+run before each release and are not part of the installed skill.
 
 ## The parsers
 
-`sma/vendor/tmdl_parser.py` and `sma/vendor/m_parser.py` are the two parsers. Their own
-suites are in `tests/parsers/`; run both after any change to a parser. The skill reads
-no code or assets from outside its own folder, which is asserted, not assumed. It reads the
-input it is given and, for a named `definition` folder, the `VerifiedAnswers` folder beside it.
+`sma/vendor/tmdl_parser.py` and `sma/vendor/m_parser.py` are the two parsers. The skill
+reads no code or assets from outside its own folder. It reads the input it is given and,
+for a named `definition` folder, the `VerifiedAnswers` folder beside it.
 
 ## Licence
 

@@ -62,7 +62,9 @@ def cmd_inspect(args):
     print("mode      : %s" % inputs.describe(res))
     for kind in ("tmdl", "m"):
         for src in res[kind]:
-            print("  %-5s %-46s %s" % (kind, src.describe()[:46], src.format or ""))
+            # The M sniffer's guess ("expression") means nothing for a file read as TMDL.
+            print("  %-5s %-46s %s" % (kind, src.describe()[:46],
+                                       "tmdl" if kind == "tmdl" else (src.format or "")))
     for src in res["sources"]:
         if src.mode is None:
             print("  ----  %-46s %s" % (src.describe()[:46], src.note))
@@ -233,6 +235,12 @@ def cmd_diff(args):
 
 
 def main(argv=None):
+    # A Windows console on code page 1252 cannot encode a Greek delta in a measure name,
+    # or the middle dot and dash in messages: the run ended with exit 1 halfway through
+    # the findings.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(
         prog="sma", description="Semantic Model Analyzer " + chr(0x2014)
         + " read a Power BI model as text and say what is in it.")

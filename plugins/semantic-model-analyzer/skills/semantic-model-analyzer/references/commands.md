@@ -218,7 +218,7 @@ placeholder (`Query1` becomes the file it came from) or hits a name collision, i
 ## Practical notes
 
 - Standard library only, Python 3.9 or newer, nothing to install.
-- The parsers live in `sma/vendor/`; their own suites ship under `tests/parsers/`.
+- The parsers live in `sma/vendor/`.
 - Two measures of the same name in one parse share an id (TMDL keeps names unique model-wide,
   so this only happens when exports are concatenated). It is resolved once at parse time and
   reported in `tmdl.merged`.

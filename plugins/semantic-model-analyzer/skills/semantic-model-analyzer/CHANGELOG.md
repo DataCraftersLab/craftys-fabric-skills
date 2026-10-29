@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.0.1 (29 October 2026)
+
+Changes from the first reviews of 1.0.0. Thank you to everyone who tested it.
+
+**Fixed**
+
+- A Windows console on code page 1252 no longer ends the run with exit 1 on a measure
+  named with a character it cannot encode, such as a Greek delta. Output is UTF-8.
+- `inspect` shows `tmdl` as the format of a TMDL file, not the Power Query sniffer's guess.
+- A `functions.tmdl` file now says DAX user-defined functions are not read yet, instead of
+  the Power Query parser's "expected Power Query M".
+- The `diff` header names each version (its `--label`, or the model it was read from)
+  before the time it was generated.
+
+**Skill**
+
+- The description says only when to use the skill, at about a third of its old length.
+- The reply fits the question: a specific question gets its answer with file and line;
+  the fix-first list and the counts line are for a review or audit.
+- Rules on credentials, writes, access, model text and outputs are stated once, in a
+  Rules section, and referred to by number everywhere else.
+- A Known limits section: Power Query steps named like TMDL keywords, DAX user-defined
+  functions, and what is not read at all, each with what to do.
+- "Do not use when" names where to go next: the Tabular Editor CLI for model edits,
+  validation and Best Practice Analyzer runs, and a PBIR tool for reports.
+
+**Packaging**
+
+- The skill ships only what runs. The tests, the contributor guide and the folder's git
+  settings left the plugin, which also keeps every path short enough for a Windows clone
+  into a deep folder.
+
 ## 1.0.0 (28 October 2026)
 
 First public release. Reads a Power BI semantic model or its Power Query as text and

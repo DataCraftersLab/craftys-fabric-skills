@@ -36,6 +36,7 @@ where the text came from is provenance rather than a code path.
 
 import hashlib
 import os
+import re
 from pathlib import Path
 
 from . import screen
@@ -67,6 +68,13 @@ PBIP_ROOT_FILES = {"model.tmdl": "model", "database.tmdl": "database",
 
 SKIP_DIRS = {".git", "__pycache__", "node_modules", ".vs", ".vscode", "dist", "build",
              ".pbi"}
+
+#: A DAX user-defined function declaration (`functions.tmdl`). The parser does not read
+#: these yet; without this the file was relayed with the M parser's "expected Power
+#: Query M" message, which sent the reader looking for the wrong problem.
+FUNCTION_RE = re.compile(r"^function\s+\S", re.MULTILINE)
+FUNCTION_NOTE = ("DAX user-defined functions are not read yet; the rest of the model is "
+                 "read as usual")
 
 MODE_TMDL = "tmdl"
 MODE_M = "m"
@@ -168,6 +176,8 @@ def classify_text(text, suffix=""):
     # model was read as Power Query -- three "could not be read" errors and no model.
     if tmdl_first and _tmdl_yield(text):
         return MODE_TMDL, fmt, ""
+    if tmdl_first and FUNCTION_RE.search(text):
+        return None, fmt, FUNCTION_NOTE
 
     decisive = DECISIVE_FORMAT.get(fmt)
     if decisive is not None:
