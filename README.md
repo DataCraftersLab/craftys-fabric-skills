@@ -2,7 +2,7 @@
 
 <!-- BG&C: positioning, tagline and intro to be finalised. Working copy below. -->
 
-Claude skills for Microsoft Fabric and Power BI, built from how we deliver for clients. Free under Apache-2.0.
+Agent skills for Microsoft Fabric and Power BI, built from how we deliver for clients. Free under Apache-2.0.
 
 ## All skills
 
@@ -22,9 +22,9 @@ A downloaded zip does not update itself. The install commands do.
 
 ## Semantic Model Analyzer
 
-**Ask Claude what is in your Power BI model. No Power BI Desktop, no XMLA connection, no Fabric access.**
+**Ask your AI agent what is in your Power BI model. No Power BI Desktop, no XMLA connection, no Fabric access.**
 
-Point Claude at a PBIP project, a folder of TMDL files, or a Power Query paste, and ask:
+Point it at a PBIP project, a folder of TMDL files, or a Power Query paste, and ask:
 
 - "Which measures have no description or no format string?"
 - "What breaks if I change `Total Sales`?"
