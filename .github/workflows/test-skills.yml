@@ -1,0 +1,32 @@
+# Runs each skill's tests on every pull request. A skill's tests live in tests/<skill>/ at the
+# repository root, outside plugins/, so no install carries them.
+name: Test skills
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Run each skill's tests
+        run: |
+          set -euo pipefail
+          for dir in tests/*/; do
+            echo "::group::${dir}"
+            python -B -m unittest discover -s "$dir"
+            for suite in "${dir}"parsers/test_*.py; do
+              [ -f "$suite" ] && python -B "$suite"
+            done
+            echo "::endgroup::"
+          done

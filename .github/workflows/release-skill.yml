@@ -41,8 +41,15 @@ jobs:
             zip_file="${name}-${version}.zip"
             (cd "plugins/${name}/skills" && zip -qr "$GITHUB_WORKSPACE/${zip_file}" "${name}" -x '*/__pycache__/*' '*.pyc')
 
+            # The notes are this version's section of the skill's CHANGELOG, then how to install.
+            notes_file="${RUNNER_TEMP}/${tag}-notes.md"
+            awk -v v="$version" 'index($0, "## " v " ") == 1 || $0 == "## " v {on = 1; next} on && /^## / {exit} on {print}' \
+              "${skill_dir}/CHANGELOG.md" > "$notes_file" 2>/dev/null || true
+            printf '\n**Install:** download %s, then upload it to Claude.ai or Claude Desktop, or unzip it into your agent'"'"'s skills folder. See the README for other install options.\n' \
+              "$zip_file" >> "$notes_file"
+
             gh release create "$tag" "$zip_file" \
               --title "${name} ${version}" \
-              --notes "Download ${zip_file}, then upload it to Claude.ai or Claude Desktop, or unzip it into your agent's skills folder. See the README for other install options."
+              --notes-file "$notes_file"
             echo "Released $tag"
           done

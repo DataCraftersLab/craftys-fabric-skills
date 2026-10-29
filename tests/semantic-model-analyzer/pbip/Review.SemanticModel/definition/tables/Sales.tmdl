@@ -1,0 +1,115 @@
+/// Fact table. Measures live here, which is what the table-reference reading got wrong.
+table Sales
+	lineageTag: a1
+
+	/// Base measure stored in its own table: reads Sales.
+	measure 'Total Sales' = SUM ( Sales[Amount] )
+		formatString: \$#,0
+		displayFolder: Sales
+		lineageTag: m1
+
+	measure 'Sales Rows' = COUNTROWS ( Sales )
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: m2
+
+	measure 'Sales Ship Date' = CALCULATE ( [Total Sales], USERELATIONSHIP ( Sales[ShipDateKey], Date[DateKey] ) )
+		formatString: \$#,0
+		displayFolder: Sales
+		lineageTag: m3
+
+	measure 'Sales Ghost Relationship' = CALCULATE ( [Total Sales], USERELATIONSHIP ( Sales[Amount], Customer[Name] ) )
+		formatString: \$#,0
+		displayFolder: Sales
+		lineageTag: m4
+
+	measure 'Sales PY' = CALCULATE ( [Total Sales], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+		formatString: \$#,0
+		displayFolder: Sales
+		lineageTag: m5
+
+	measure 'Sales Base Via Table' = Sales[Total Sales] * 2
+		formatString: \$#,0
+		displayFolder: Sales
+		lineageTag: m6
+
+	measure 'Unformatted Count' = DISTINCTCOUNT ( Sales[CustomerKey] )
+		displayFolder: Sales
+		lineageTag: m7
+
+	measure 'Label A' = "Sales  Report"
+		displayFolder: Labels
+		lineageTag: m8
+
+	measure 'Label B' = "sales report"
+		displayFolder: Labels
+		lineageTag: m9
+
+	measure 'Injected' = 1
+		displayFolder: Labels
+		lineageTag: m10
+		formatStringDefinition = SELECTEDMEASUREFORMATSTRING()
+
+	measure 'Broken Paste'
+		displayFolder: Labels
+		lineageTag: m11
+
+	column Amount
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: Amount
+		lineageTag: c1
+
+	column Margin
+		dataType: double
+		summarizeBy: none
+		sourceColumn: Margin
+		lineageTag: c2
+
+	column CustomerKey
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: CustomerKey
+		lineageTag: c3
+
+	column RegionKey
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: RegionKey
+		lineageTag: c4
+
+	column OrderDateKey
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: OrderDateKey
+		lineageTag: c5
+
+	column ShipDateKey
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ShipDateKey
+		lineageTag: c6
+
+	column DueDateKey
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: DueDateKey
+		lineageTag: c7
+
+	column Channel
+		dataType: string
+		summarizeBy: count
+		sourceColumn: Channel
+		lineageTag: c8
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(ServerName, "Warehouse"),
+				    dbo_Sales = Source{[Schema="dbo",Item="Sales"]}[Data]
+				in
+				    dbo_Sales
+
+	annotation PBI_ResultType = Table
+

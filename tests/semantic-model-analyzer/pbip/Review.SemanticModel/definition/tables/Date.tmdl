@@ -1,0 +1,58 @@
+table Date
+	lineageTag: e1
+	dataCategory: Time
+
+	column DateKey
+		dataType: int64
+		isKey
+		summarizeBy: none
+		sourceColumn: DateKey
+		lineageTag: f1
+
+	column Date
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: Date
+		lineageTag: f2
+
+	column Year
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Year
+		lineageTag: f3
+
+	column 'Month Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: MonthName
+		lineageTag: f4
+
+	column 'Month Sorted'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: MonthName
+		sortByColumn: MonthNo
+		lineageTag: f5
+
+	column MonthNo
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: MonthNo
+		lineageTag: f6
+
+	hierarchy 'Calendar'
+		lineageTag: h1
+
+		level Year
+			lineageTag: h2
+			column: Year
+
+		level Month
+			lineageTag: h3
+			column: 'Month Sorted'
+
+	partition Date = calculated
+		mode: import
+		source = CALENDAR ( DATE ( 2020, 1, 1 ), DATE ( 2026, 12, 31 ) )
+
