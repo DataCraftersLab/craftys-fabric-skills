@@ -49,7 +49,8 @@ offline report that can be walked through.
 - The user wants the model changed, validated or run through Best Practice Analyzer. This skill
   is read-only; continue with the Tabular Editor CLI, a TMDL editing skill, or Power BI Desktop.
 - The model has to be fetched from a workspace. This skill opens no connection of any kind; the
-  user exports the definition with their own access and hands it over.
+  user exports the definition with their own access (for example with the Fabric CLI's
+  `fab export`, or by saving it as a PBIP in Power BI Desktop) and hands it over.
 - Only a `.pbix`, `.zip` or `model.bim` is available. Ask for the model saved as a PBIP with
   TMDL, or exported as TMDL.
 
@@ -142,20 +143,25 @@ Each rule is stated once, here; the sections below refer to it by number.
    | Which ..., how many ... | `sma list PATHS KIND --where FIELD=VALUE [--count]` |
    | Everything about one measure, table, `Table[Column]`, relationship, role or query | `sma explain PATHS "Name" --wide` |
    | What needs attention | `sma analyse PATHS` (`--all` adds notes) |
-   | What changed between two versions | `sma dataset` each version into the scratch folder, then `sma diff "$SCRATCH/before.json" "$SCRATCH/after.json"` |
+   | What changed between two versions | `sma dataset` each version into the scratch folder, then `sma diff "SCRATCH/before.json" "SCRATCH/after.json"` |
+   | How ready it is for Copilot or a data agent | `sma dataset` into the scratch folder, then read `tmdl.aiReadiness` (`references/commands.md`) |
    | A report or document to walk someone through | `sma render PATHS -o OUT` |
 
-   For more than one question or a comparison, parse into a fresh scratch folder and pass
-   `--report` to the rest, so parallel sessions never share a file (`python3` on macOS/Linux):
+   For more than one question or a comparison, parse once into a fresh scratch folder and pass
+   `--report` to the rest, so parallel sessions never share a file. Create the folder and note
+   the full path it prints (`python3` on macOS/Linux):
 
    ```bash
-   SCRATCH=$(python -c "import tempfile; print(tempfile.mkdtemp(prefix='sma-'))")          # Bash
-   $SCRATCH = python -c "import tempfile; print(tempfile.mkdtemp(prefix='sma-'))"          # PowerShell
-   sma dataset PATHS -o "$SCRATCH/report.json" -q
+   python -c "import tempfile; print(tempfile.mkdtemp(prefix='sma-'))"
+   sma dataset PATHS -o "SCRATCH/report.json" -q
    ```
 
+   `SCRATCH` stands for that printed path, written out in full in every later command. A shell
+   variable does not survive from one tool call to the next, and an empty one would turn
+   `$SCRATCH/report.json` into a file at the drive root.
+
    Terminal output is shortened to fit. For the full text of findings use
-   `sma list --report "$SCRATCH/report.json" findings --all --wide`; for what a finding code means
+   `sma list --report "SCRATCH/report.json" findings --all --wide`; for what a finding code means
    and why it matters, read the dataset's `help` map (`references/commands.md`). Do not read
    answers out of the HTML. Reading the source files to check or add to what the engine reports
    is fine; cite the file and line and say it is your reading, not an engine finding.
@@ -166,8 +172,9 @@ Each rule is stated once, here; the sections below refer to it by number.
    what was read.
 5. **Write files only when asked**, under R2: an absolute path for `-o` and `--json`, and a look
    at the target before writing.
-6. **Clean up on every exit**: delete the scratch folder from step 3, whether the task finished
-   or stopped on an error, a denied read or a credential.
+6. **Clean up on every exit**: delete the scratch folder from step 3 by its full path, whether
+   the task finished or stopped on an error, a denied read or a credential:
+   `python -c "import shutil, sys; shutil.rmtree(sys.argv[1])" "SCRATCH"`.
 7. **Reply** per the Output contract and the claims rules below.
 
 ## Output contract
@@ -185,7 +192,8 @@ with the `File.tmdl:line` the engine printed, and a coverage caveat when the han
   2. **Any other questions the user asked**, answered.
   3. **The rest as counts**: the counts line as `analyse` prints it (`N could not be read, N worth
      acting on, N worth knowing, N rules fired`) and where to see the full list
-     (`sma analyse --all`, or the report's Findings section). Do not paste every note.
+     (`sma analyse --all`, or the report's Findings section). Do not paste every note. When few
+     or no measures have descriptions, add the figure from `tmdl.totals.described`.
 - **A comparison** follows `diff`: what changed in model terms and the measures downstream of
   each changed one.
 - **Files written**, whenever any were: the full paths, `index.html` first. When pointing at one
@@ -225,8 +233,8 @@ The thirty rules, their levels and the rules file are in `references/findings.md
 - **Not read at all**: `.pbix`, `.zip` and `model.bim` files (Do not use when), and a PBIP's
   `.Report` folder, which is why a measure is unreferenced rather than unused (Claims).
 - **A model with no descriptions** shows nothing about it in the findings list, because missing
-  descriptions are coverage (Claims). In a review, give the figure from the dataset's
-  `tmdl.totals.described`.
+  descriptions are coverage (Claims). In a review the figure goes with the counts (Output
+  contract).
 
 ## Security and access
 - **Access and connections**: R3. **Credentials**: R1. **Where outputs go**: R5. **Text inside

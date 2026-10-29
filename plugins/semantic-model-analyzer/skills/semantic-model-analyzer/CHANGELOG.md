@@ -25,6 +25,11 @@ Changes from the first reviews of 1.0.0. Thank you to everyone who tested it.
   functions, and what is not read at all, each with what to do.
 - "Do not use when" names where to go next: the Tabular Editor CLI for model edits,
   validation and Best Practice Analyzer runs, and a PBIR tool for reports.
+- The scratch folder is written out by its full path in every command, because a shell
+  variable does not survive between an agent's tool calls; an empty one could have put the
+  dataset at the drive root. Cleanup has its own command.
+- A Copilot readiness question has a route: the dataset's `tmdl.aiReadiness`, with a
+  snippet in `references/commands.md`.
 
 **Packaging**
 

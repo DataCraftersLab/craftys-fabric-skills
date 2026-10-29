@@ -21,11 +21,13 @@ $env:PYTHONPATH = "SKILL_DIR"; python -B -m sma COMMAND [PATHS] [options]   # Po
 `analyze` is accepted as a spelling of `analyse`.
 
 A scratch folder for a dataset that answers several questions, fresh per run so parallel
-sessions never share a file, and deleted when the task ends:
+sessions never share a file, and deleted when the task ends. Create it, note the full path it
+prints, and write that path out in every later command; below it is shown as `SCRATCH`. A shell
+variable does not survive from one tool call to the next.
 
 ```bash
-SCRATCH=$(python -c "import tempfile; print(tempfile.mkdtemp(prefix='sma-'))")          # Bash
-$SCRATCH = python -c "import tempfile; print(tempfile.mkdtemp(prefix='sma-'))"          # PowerShell
+python -c "import tempfile; print(tempfile.mkdtemp(prefix='sma-'))"           # create
+python -c "import shutil, sys; shutil.rmtree(sys.argv[1])" "SCRATCH"          # delete
 ```
 
 ## The credential screen
@@ -163,14 +165,29 @@ usage).
 ## Reading the dataset directly
 
 ```bash
-sma dataset ./definition -o "$SCRATCH/report.json" -q
+sma dataset ./definition -o "SCRATCH/report.json" -q
 python -c "
 import json, sys; r = json.load(open(sys.argv[1], encoding='utf-8'))
 t = r['tmdl']
 print(t['totals'])
 print(t['relationshipStats'])
 print([m['name'] for m in t['measures'] if not (m.get('description') or '').strip()][:20])
-" "$SCRATCH/report.json"
+" "SCRATCH/report.json"
+```
+
+How ready the model is for Copilot or a data agent is in `tmdl.aiReadiness`: a `summary`
+(passed, failed and unknown out of sixteen) and `groups`, each holding `checks` with a
+`label`, a `status` and a `detail`. The status is `pass`, `fail` or `na`, which means the
+input cannot show it (counted as `unknown` in the summary, and "not in this input" is not a
+fail):
+
+```bash
+python -c "
+import json, sys; a = json.load(open(sys.argv[1], encoding='utf-8'))['tmdl']['aiReadiness']
+print(a['summary'])
+for g in a['groups']:
+    for c in g['checks']: print(c['status'], '|', c['label'], '|', c['detail'])
+" "SCRATCH/report.json"
 ```
 
 What a finding code means, and why it might matter, is in the `help` map (code to text). Quote
@@ -180,7 +197,7 @@ it rather than inventing a rationale:
 python -c "
 import json, sys; h = json.load(open(sys.argv[1], encoding='utf-8'))['help']
 for code in sys.argv[2:]: print(code + ': ' + h.get(code, '(no such code)'))
-" "$SCRATCH/report.json" parse-failed relationship-loop
+" "SCRATCH/report.json" parse-failed relationship-loop
 ```
 
 The dataset is the contract, so read it rather than scraping the HTML. Its shape is documented
