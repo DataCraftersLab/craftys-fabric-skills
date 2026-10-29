@@ -15,3 +15,19 @@ Open an issue with the question. If it is about a specific model or query, the s
 ## Changes
 
 If you want to suggest a change, open an issue first so we can talk it through.
+
+## Tests
+
+Each skill's tests are in `tests/<skill>/`, outside `plugins/`, so no install carries them. They need only Python. Run them from the repository root before a release:
+
+```
+python -m unittest discover -s tests/semantic-model-analyzer
+python tests/semantic-model-analyzer/parsers/test_tmdl_parser.py
+python tests/semantic-model-analyzer/parsers/test_m_parser.py
+```
+
+The browser checks need Playwright (`pip install playwright && playwright install chromium`):
+
+```
+python tests/semantic-model-analyzer/validate_html.py
+```

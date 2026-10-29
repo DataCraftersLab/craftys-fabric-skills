@@ -1,0 +1,33 @@
+table Customer
+	lineageTag: b1
+
+	column CustomerKey
+		dataType: int64
+		isKey
+		summarizeBy: none
+		sourceColumn: CustomerKey
+		lineageTag: d1
+
+	column Name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Name
+		lineageTag: d2
+
+	column RegionKey
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: RegionKey
+		lineageTag: d3
+
+	/// A description with a script tag in it: </script><script>document.title="pwned"</script>
+	column Note
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Note
+		lineageTag: d4
+
+	partition Customer = m
+		mode: import
+		source = #"Shared Staging"
+

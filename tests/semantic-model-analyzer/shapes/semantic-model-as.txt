@@ -1,0 +1,21 @@
+table Fulfilment
+	lineageTag: 7f1c2e40-0001-4a11-9b21-000000000001
+
+	measure 'Completed Orders' = CALCULATE(COUNTROWS('Fulfilment'), 'Fulfilment'[Status] = "Complete")
+		formatString: #,0
+		displayFolder: Volume
+		description: Orders whose status has reached Complete.
+
+	measure 'Completion Rate' = DIVIDE([Completed Orders], COUNTROWS('Fulfilment'))
+		formatString: 0.0%
+		displayFolder: Volume
+
+	column Status
+		dataType: string
+		lineageTag: 7f1c2e40-0002-4a11-9b21-000000000002
+		summarizeBy: none
+
+	column OrderDate
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 7f1c2e40-0003-4a11-9b21-000000000003

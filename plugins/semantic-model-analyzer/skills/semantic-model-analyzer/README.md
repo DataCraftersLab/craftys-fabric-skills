@@ -329,8 +329,9 @@ sma/
   vendor/                 the TMDL and M parsers
 ```
 
-The skill holds only what runs. Its tests, the parser suites and the browser checks are
-run before each release and are not part of the installed skill.
+The skill holds only what runs. Its tests, the parser suites and the browser checks are in
+`tests/semantic-model-analyzer/` at the root of this repository. They are run before each
+release and are not part of the installed skill.
 
 ## The parsers
 
